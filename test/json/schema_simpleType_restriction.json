@@ -1,0 +1,14 @@
+{
+  "definitions": { 
+    "IOC-Country-Code": { 
+      "enum": [
+        "AFG", 
+        "AHO",
+        "ALB",
+        "ALG" 
+      ], 
+      "type": "string",
+      "description": "Three-letter country code of 212 countries and areas, used by the International Olympic Committee (IOC)."
+    }
+  }
+}

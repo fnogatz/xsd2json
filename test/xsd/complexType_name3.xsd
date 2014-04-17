@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<xs:schema>
+  <xs:complexType name="pets">
+    <xs:sequence>
+      <xs:element name="dog" type="xs:string"/>
+      <xs:element name="cat" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="shapes">
+    <xs:sequence>
+      <xs:element name="circle" type="xs:string"/>
+      <xs:element name="square" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

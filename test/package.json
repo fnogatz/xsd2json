@@ -1,0 +1,22 @@
+{
+  "name": "xsd2json-tester",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Falco Nogatz <fnogatz@gmail.com>",
+  "description": "script to TAP test the xsd2json CHR library",
+  "main": "./tap.js",
+  "dependencies": {
+    "interpreted": "0.3.x",
+    "nomnom": "1.6.x",
+    "tv4": "1.0.x",
+    "async": "0.2.x",
+    "tap": "0.4.x",
+    "tap-prettify": "0.0.x"
+  },
+  "engines": {
+    "node": ">=0.6"
+  },
+  "scripts": {
+
+  }
+}

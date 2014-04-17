@@ -1,0 +1,13 @@
+{
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "dog": {
+          "type": "string"
+        }
+      },
+      "required": ["dog"]
+    }
+  }
+}

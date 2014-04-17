@@ -1,0 +1,26 @@
+{
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "dog": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 3,
+          "maxItems": 8
+        },
+        "amount": {
+          "$ref": "#/definitions/myInteger"
+        }
+      },
+      "required": ["dog"]
+    },
+    "myInteger": {
+      "type": "integer",
+      "maximum": 8,
+      "exclusiveMaximum": false
+    }
+  }
+}

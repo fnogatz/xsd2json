@@ -1,0 +1,23 @@
+{
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/@amount"
+        }
+      }
+    },
+    "houses": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/@amount"
+        }
+      }
+    },
+    "@amount": {
+      "type": "integer"
+    }
+  }
+}

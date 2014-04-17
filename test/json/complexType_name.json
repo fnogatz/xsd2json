@@ -1,0 +1,13 @@
+{
+  "definitions": {
+    "myType": {
+      "type": "object",
+      "properties": {
+        "dog": {
+          "type": "string"
+        }
+      },
+      "required": ["dog"]
+    }
+  }
+}

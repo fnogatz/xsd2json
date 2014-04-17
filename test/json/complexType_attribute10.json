@@ -1,0 +1,15 @@
+{
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/@amount"
+        }
+      }
+    },
+    "@amount": {
+      "type": "integer"
+    }
+  }
+}

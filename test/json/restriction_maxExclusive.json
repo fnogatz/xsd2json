@@ -1,0 +1,9 @@
+{
+  "definitions": {
+    "dog": {
+      "type": "integer",
+      "maximum": 100,
+      "exclusiveMaximum": true
+    }
+  }
+}

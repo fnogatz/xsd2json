@@ -1,0 +1,28 @@
+{
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "dog": {
+          "type": "string"
+        },
+        "cat": {
+          "type": "string"
+        }
+      },
+      "required": ["dog", "cat"]
+    },
+    "shapes": {
+      "type": "object",
+      "properties": {
+        "circle": {
+          "type": "string"
+        },
+        "square": {
+          "type": "string"
+        }
+      },
+      "required": ["circle", "square"]
+    }
+  }
+}

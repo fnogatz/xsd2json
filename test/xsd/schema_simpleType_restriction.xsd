@@ -1,0 +1,17 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified">
+  <xs:simpleType name="IOC-Country-Code">
+    <xs:annotation>
+      <xs:documentation>
+              Three-letter country code of 212 countries and areas,
+              used by the International Olympic Committee (IOC).
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AFG"/> <!-- Afghanistan -->
+      <xs:enumeration value="AHO"/> <!-- Netherlands Antilles -->
+      <xs:enumeration value="ALB"/> <!-- Albania -->
+      <xs:enumeration value="ALG"/> <!-- Algeria -->
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

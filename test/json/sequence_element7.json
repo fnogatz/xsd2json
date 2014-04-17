@@ -1,0 +1,18 @@
+{
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "dog": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 4,
+          "maxItems": 42
+        }
+      },
+      "required": ["dog"]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "default": 42
+        }
+      },
+      "required": [ "amount" ]
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "definitions": {
+    "dog": {
+      "type": "integer",
+      "minimum": 100,
+      "exclusiveMinimum": false
+    }
+  }
+}

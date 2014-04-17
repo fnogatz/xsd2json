@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<foo:schema xmlns:foo="http://www.w3.org/2001/XMLSchema">
+  <foo:element name="dog" type="foo:string" />
+</foo:schema>

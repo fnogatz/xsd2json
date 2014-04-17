@@ -1,0 +1,11 @@
+<xs:schema>
+  <xs:complexType name="pets">
+    <xs:attribute name="amount" type="myInteger" />
+  </xs:complexType>
+
+  <xs:simpleType name="myInteger">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="8" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

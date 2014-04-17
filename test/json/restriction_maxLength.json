@@ -1,0 +1,8 @@
+{
+  "definitions": {
+    "dog": {
+      "type": "string",
+      "maxLength": 10
+    }
+  }
+}

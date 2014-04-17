@@ -1,0 +1,5 @@
+<xs:schema>
+  <xs:complexType name="pets">
+    <xs:attribute name="amount" type="xs:integer" id="someSampleID" />
+  </xs:complexType>
+</xs:schema>

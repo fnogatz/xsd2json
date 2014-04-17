@@ -1,0 +1,11 @@
+{
+  "definitions": {
+    "dog": {
+      "type": "string",
+      "enum": [
+        "Border Collie",
+        "Golden Retriever"
+      ]
+    }
+  }
+}
