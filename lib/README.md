@@ -10,7 +10,7 @@ All you need is [SWI-Prolog](http://www.swi-prolog.org/). See there for installa
 
 `xsd2json` provides a command line interface. You can use it via
 
-	swipl --quiet --nodebug --g 'main,halt' -s cli.pl -- < /path/to/your.xsd
+	swipl --quiet --nodebug -g 'main,halt' -s cli.pl -- < /path/to/your.xsd
 
 Unfortunately the command line version is way slower than using `xsd2json` programmatically. The `xsd2json.pl` module provides a predicate `xsd2json/2` which can be used to convert a given XSD file into the equivalent JSON Schema. Call it via `swipl -s xsd2json.pl` followed by
 

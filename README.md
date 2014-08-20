@@ -13,7 +13,7 @@ Translation with CHR"](http://arxiv.org/pdf/1406.2125v1.pdf).
 
 All you need is [SWI-Prolog](http://www.swi-prolog.org/). `xsd2json` provides a command line interface. You can use it via
 
-	swipl --quiet --nodebug --g 'main,halt' -s cli.pl -- < /path/to/your.xsd
+	swipl --quiet --nodebug -g 'main,halt' -s cli.pl -- < /path/to/your.xsd
 
 For further instructions, e.g. how to use `xsd2json` programmatically, have a look at the tool's [Readme](https://github.com/fnogatz/xsd2json/tree/master/lib).
 
