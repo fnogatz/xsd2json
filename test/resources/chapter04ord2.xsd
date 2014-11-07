@@ -1,0 +1,19 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://example.org/ord"
+            targetNamespace="http://example.org/ord"
+            xmlns:prod="http://example.org/prod">
+
+  <!-- A complex type representing an order. Is uses types included from other schemas as elements -->
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element name="number" type="OrderNumType"/>
+      <xs:element name="customer" type="CustomerType"/>
+      <xs:element name="items" type="prod:ItemsType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="OrderNumType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+</xs:schema>

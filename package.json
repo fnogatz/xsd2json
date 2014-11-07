@@ -1,0 +1,31 @@
+{
+  "name": "xsd-merger",
+  "version": "0.0.0",
+  "description": "Merge a XSD schema with all its includes and merge extended complex types",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "keywords": [
+    "XSD"
+  ],
+  "author": "Alban Mouton <alban.mouton@gmail.com>",
+  "license": "GPL2",
+  "devDependencies": {
+    "mocha": "^2.0.1",
+    "should": "^4.1.0"
+  },
+  "dependencies": {
+    "async": "^0.9.0",
+    "commander": "^2.5.0",
+    "jayschema": "^0.3.1",
+    "lodash": "^2.4.1",
+    "lodash-deep": "^1.4.2",
+    "request": "^2.47.0",
+    "winston": "^0.8.3",
+    "xml2js": "^0.4.4"
+  },
+  "bin": {
+    "xsd-merger": "./bin/xsd-merger"
+  }
+}

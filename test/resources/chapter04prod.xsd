@@ -1,0 +1,34 @@
+<s:schema xmlns:s="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://example.org/prod"
+            targetNamespace="http://example.org/prod">
+  <s:complexType name="ItemsType">
+    <s:sequence>
+      <s:element name="product" type="ProductType"/>
+    </s:sequence>
+  </s:complexType>
+  <s:complexType name="ProductType">
+    <s:sequence>
+      <s:element name="number" type="s:integer"/>
+      <s:element name="name" type="s:string"/>
+      <s:element name="size" type="SizeType"/>
+      <s:element name="color" type="ColorType"/>
+    </s:sequence>
+  </s:complexType>
+  
+  <s:complexType name="SizeType">
+    <s:simpleContent>
+      <s:extension base="s:integer">
+        <s:attribute name="system" type="s:string"/>
+      </s:extension>
+    </s:simpleContent>
+  </s:complexType>
+
+  <!--<s:complexType name="SizeType">
+    <s:attribute name="value" type="s:string"/>
+    <s:attribute name="system" type="s:string"/>
+  </s:complexType>-->
+
+  <s:complexType name="ColorType">
+    <s:attribute name="value" type="s:string"/>
+  </s:complexType>
+</s:schema>

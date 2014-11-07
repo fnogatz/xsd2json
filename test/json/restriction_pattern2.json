@@ -1,8 +1,0 @@
-{
-  "definitions": {
-    "dog": {
-      "type": "string",
-      "pattern": "([A-Z]|[a-z])"
-    }
-  }
-}
