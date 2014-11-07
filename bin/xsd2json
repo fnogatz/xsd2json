@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+var spinner = require('char-spinner');
+var xsd2json = require('../index');
+
+spinner();
+
+process.stdin
+  .pipe(xsd2json())
+  .pipe(process.stdout);

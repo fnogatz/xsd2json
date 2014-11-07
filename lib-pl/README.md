@@ -1,6 +1,6 @@
 # xsd2json
 
-CHR module to translate an XML Schema into equivalent JSON Schema.
+Prolog/CHR module to translate an XML Schema into equivalent JSON Schema.
 
 ## Installation
 

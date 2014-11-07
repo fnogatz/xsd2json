@@ -1,17 +1,13 @@
 var fs = require('fs');
 var path = require('path');
-var childProcess = require('child_process');
-var util = require('util');
+
+var xsd2json = require('../index');
 
 var interpreted = require('interpreted');
 var tap = require('tap');
 var tv4 = require('tv4');
 var parser = require('nomnom');
 var async = require('async');
-
-
-var PROLOG = 'swipl';
-var XSD2JSON = path.resolve(__dirname, '..', 'lib', 'cli.pl');
 
 
 // get possible filenames
@@ -25,7 +21,6 @@ fs.readdir(path.resolve(__dirname, 'xsd'), function(err, filenames) {
 
 
 function parseArguments(filenames) {
-  
   parser.command('interpreted')
     .help('run all interpreted tests')
     .option('files', {
@@ -59,44 +54,11 @@ function parseArguments(filenames) {
     })
     .callback(runInterpretedTests);
 
-  parser.command('transform')
-    .help('transform a single XSD file')
-    .option('input', {
-      abbr: 'i',
-      help: 'XSD file to transform'
-    })
-    .callback(transformFile);
-
   parser.command('validate-json')
     .help('validate the JSON test files against the draft-04 JSON Schema')
     .callback(validateJSONfiles);
 
   parser.parse();
-}
-
-
-function converter(callback) {
-  var prolog = childProcess.spawn(PROLOG, ['--quiet', '--nodebug', '-g', 'main,halt', '-s', XSD2JSON, '--']);
-
-  prolog.stdout.setEncoding('utf8');
-  var json = '';
-  prolog.stdout.on('data', function(data) {
-    json += data;
-  });
-  prolog.stdout.on('end', function() {
-    try {
-      var parsed = JSON.parse(json);
-    } catch(err) {
-      callback(null, '[Error] No valid JSON: '+json);
-      return;
-    }
-    callback(null, parsed);
-  });
-  prolog.stdout.on('error', function(err) {
-    callback(err);
-  });
-
-  return prolog.stdin;
 }
 
 
@@ -135,9 +97,7 @@ function runInterpretedTests(options) {
 
     // This method will be used to test the files.
     test: function (name, content, callback) {
-      var stream = converter(callback);
-      stream.write(content);
-      stream.end();
+      xsd2json(content, callback);
     },
 
     // This method will execute before the file tests.
@@ -150,25 +110,6 @@ function runInterpretedTests(options) {
       callback(null);
     }
   });
-}
-
-
-function transformFile(options) {
-  var stream = converter(function(err, json) {
-    if (err)
-      throw err;
-
-    util.puts(util.inspect(json,false,null));
-  });  
-
-  if (options.input) {
-    // read from file
-    fs.createReadStream(options.input).pipe(stream);
-  }
-  else {
-    // read from stdin
-    process.stdin.pipe(stream);
-  }
 }
 
 
