@@ -1,0 +1,27 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://example.org/ord"
+            xmlns="http://example.org/ord"
+            xmlns:prod="http://example.org/prod">
+  
+  <!-- include elements to merge into this schema -->
+  <xs:include schemaLocation="./chapter04ord2.xsd"/>
+  <xs:include schemaLocation="./chapter04cust.xsd"/>
+  <xs:import namespace="http://example.org/prod"
+                 schemaLocation="./chapter04prod.xsd"/>
+  
+  <!-- element that should be defined by a document using this schema.
+  elements from included schemas will be ignored, only the types matter -->
+  <xs:element name="order" type="CompletedOrderType"/>
+
+  <!-- A complex type representing a completed order. It extends order and adds a date -->
+  <xs:complexType name="CompletedOrderType">
+    <xs:complexContent>
+      <xs:extension base="OrderType">
+        <xs:sequence>
+          <xs:element name="date" type="xs:date"/>
+          <xs:element name="paidFor" type="xs:boolean" default="true"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

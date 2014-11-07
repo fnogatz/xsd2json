@@ -1,9 +1,0 @@
-{
-  "type": "myType",
-  "definitions": {
-    "myType": {
-      "type": "string",
-      "enum": [ "dog", "cat" ]
-    }
-  }
-}

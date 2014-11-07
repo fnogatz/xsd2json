@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var program = require('commander');
+var winston = require('winston');
+
+var xsd2json = require('../');
+
+program
+	.version('0.0.0')
+	.usage('[options] <filePath>')
+	.option('-o, --output [outputPath]', 'specify a path to write the output')
+	.option('-v, --verbose', 'increase verbosity')
+	.parse(process.argv);
+
+var filePath = process.argv[process.argv.length - 1];
+
+var log = winston.loggers.get('xsd2json');
+log.transports.console.level = program.verbose ? 'debug' : 'error';
+
+log.cli();
+
+xsd2json.xsd2json(filePath, function(err, result) {
+	if (err) throw err;
+	if (program.output) {
+		fs.writeFile(program.output, result);
+	} else {
+		log.debug('JSON schema result:\n');
+		console.log(result);
+		log.debug('\nUse -o --output option to save result to a file');
+	}
+});
