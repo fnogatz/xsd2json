@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<xs:schema>
-  <xs:complexType name="pets">
-    <xs:all>
-      <xs:element name="dog" type="xs:string" minOccurs="1" maxOccurs="1" />
-    </xs:all>
-  </xs:complexType>
-</xs:schema>

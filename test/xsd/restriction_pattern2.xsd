@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<xs:schema>
-  <xs:simpleType name="dog">
-    <xs:restriction base="xs:string">
-      <xs:pattern value="[a-z]" />
-      <xs:pattern value="[A-Z]" />
-    </xs:restriction>
-  </xs:simpleType>
-</xs:schema>

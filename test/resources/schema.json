@@ -1,0 +1,132 @@
+{
+  "definitions": {
+    "exampleorgord:OrderNumType": {
+      "type": "string"
+    },
+    "exampleorgord:CustNameType": {
+      "type": "string"
+    },
+    "exampleorgord:CompletedOrderType": {
+      "required": [
+        "number",
+        "customer",
+        "date",
+        "paidFor"
+      ],
+      "type": "object",
+      "properties": {
+        "number": {
+          "$ref": "#/definitions/exampleorgord:OrderNumType"
+        },
+        "customer": {
+          "$ref": "#/definitions/exampleorgord:CustomerType"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleorgprod:ItemsType"
+          },
+          "minItems": 0
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "paidFor": {
+          "type": "boolean"
+        }
+      }
+    },
+    "exampleorgord:OrderType": {
+      "required": [
+        "number",
+        "customer"
+      ],
+      "type": "object",
+      "properties": {
+        "number": {
+          "$ref": "#/definitions/exampleorgord:OrderNumType"
+        },
+        "customer": {
+          "$ref": "#/definitions/exampleorgord:CustomerType"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleorgprod:ItemsType"
+          },
+          "minItems": 0
+        }
+      }
+    },
+    "exampleorgord:CustomerType": {
+      "required": [
+        "name",
+        "number"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/exampleorgord:CustNameType"
+        },
+        "number": {
+          "type": "integer"
+        }
+      }
+    },
+    "exampleorgprod:ItemsType": {
+      "required": [
+        "product"
+      ],
+      "type": "object",
+      "properties": {
+        "product": {
+          "$ref": "#/definitions/exampleorgprod:ProductType"
+        }
+      }
+    },
+    "exampleorgprod:ProductType": {
+      "required": [
+        "size",
+        "color",
+        "number",
+        "name"
+      ],
+      "type": "object",
+      "properties": {
+        "size": {
+          "$ref": "#/definitions/exampleorgprod:SizeType"
+        },
+        "color": {
+          "$ref": "#/definitions/exampleorgprod:ColorType"
+        },
+        "number": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "exampleorgprod:ColorType": {
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "exampleorgprod:SizeType": {
+      "properties": {
+        "system": {
+          "type": "string"
+        },
+        "@value": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "$ref": "#/definitions/exampleorgord:CompletedOrderType"
+}

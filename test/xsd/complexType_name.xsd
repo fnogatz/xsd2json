@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<xs:schema>
-  <xs:complexType name="myType">
-    <xs:sequence>
-      <xs:element name="dog" type="xs:string" />
-    </xs:sequence>
-  </xs:complexType>
-</xs:schema>

@@ -1,9 +1,0 @@
-<xs:schema>
-  <xs:complexType name="pets">
-    <xs:sequence>
-      <xs:element name="amount" type="xs:string" />
-    </xs:sequence>
-    
-    <xs:attribute name="amount" type="xs:integer" />
-  </xs:complexType>
-</xs:schema>
