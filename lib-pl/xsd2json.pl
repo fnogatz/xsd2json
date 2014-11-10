@@ -367,20 +367,6 @@ to_number(Number,Number) :-
 
 
 /**
- * json_false/1
- * json_true/1
- *
- * Predicate which holds the JSON Schema entities
- *   for the boolean `true` and `false`. This might
- *   be useful for assignments of the form
- *   `A = [some=@true]` which is syntactically incorrect,
- *   while `True=@true, A = [some=True]` is okay.
- */
-json_false(@false).
-json_true(@true).
-
-
-/**
  * string_concat/2
  * string_concat(List_Of_Strings,Concatenated_String)
  *
@@ -659,10 +645,10 @@ convert_xsd_type(double,json([type=number])).
 convert_xsd_type(decimal,json([type=number])).
 convert_xsd_type(integer,json([type=integer])).
 
-convert_xsd_type(positiveInteger,json([type=integer,minimum=0,exclusiveMinimum=True])) :- json_true(True).
-convert_xsd_type(negativeInteger,json([type=integer,maximum=0,exclusiveMaximum=True])) :- json_true(True).
-convert_xsd_type(nonPositiveInteger,json([type=integer,maximum=0,exclusiveMaximum=False])) :- json_false(False).
-convert_xsd_type(nonNegativeInteger,json([type=integer,minimum=0,exclusiveMinimum=False])) :- json_false(False).
+convert_xsd_type(positiveInteger,json([type=integer,minimum=0,exclusiveMinimum= @(true)])).
+convert_xsd_type(negativeInteger,json([type=integer,maximum=0,exclusiveMaximum= @(true)])).
+convert_xsd_type(nonPositiveInteger,json([type=integer,maximum=0,exclusiveMaximum= @false])).
+convert_xsd_type(nonNegativeInteger,json([type=integer,minimum=0,exclusiveMinimum= @false])).
 
 
 /**
@@ -677,26 +663,22 @@ convert_xsd_type(nonNegativeInteger,json([type=integer,minimum=0,exclusiveMinimu
 % minExclusive
 convert_xsd_restriction(minExclusive,Value,json(JSON_List)) :-
   to_number(Value,Number),
-  json_true(True),
-  JSON_List = [minimum=Number,exclusiveMinimum=True].
+  JSON_List = [minimum=Number,exclusiveMinimum= @(true)].
 
 % maxExclusive
 convert_xsd_restriction(maxExclusive,Value,json(JSON_List)) :-
   to_number(Value,Number),
-  json_true(True),
-  JSON_List = [maximum=Number,exclusiveMaximum=True].
+  JSON_List = [maximum=Number,exclusiveMaximum= @(true)].
 
 % minInclusive
 convert_xsd_restriction(minInclusive,Value,json(JSON_List)) :-
   to_number(Value,Number),
-  json_false(False),
-  JSON_List = [minimum=Number,exclusiveMinimum=False].
+  JSON_List = [minimum=Number,exclusiveMinimum= @false].
 
 % maxInclusive
 convert_xsd_restriction(maxInclusive,Value,json(JSON_List)) :-
   to_number(Value,Number),
-  json_false(False),
-  JSON_List = [maximum=Number,exclusiveMaximum=False].
+  JSON_List = [maximum=Number,exclusiveMaximum= @false].
 
 % minLength
 convert_xsd_restriction(minLength,Value,json(JSON_List)) :-
