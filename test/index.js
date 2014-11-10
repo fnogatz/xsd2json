@@ -97,7 +97,8 @@ function runInterpretedTests(options) {
 
     // This method will be used to test the files.
     test: function (name, content, callback) {
-      xsd2json(content, callback);
+      var filename = path.resolve(__dirname, 'xsd', name+'.xsd');
+      xsd2json(filename, callback);
     },
 
     // This method will execute before the file tests.
