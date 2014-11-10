@@ -1,6 +1,7 @@
 :- module(xsd2json, [ xsd2json/2, flatten_xsd/1 ]).
 :- use_module(merge_json).
 :- use_module(library(chr)).
+:- use_module(library(http/http_open)).
 
 
 /**
@@ -192,8 +193,18 @@ parse_options([
  *   load_xsd(stream(user_input),XSD).  %% binds XSD to the DOM tree
  */
 load_xsd(Input,XSD) :- 
-  parse_options(Parse_Options), 
-  load_structure(Input,XSD,Parse_Options).
+  parse_options(Parse_Options),
+  (
+      (
+          string_concat('http://',_,Input)
+        ; 
+          string_concat('https://',_,Input)
+      ),
+      http_open:http_open(Input,In,[])
+    ;
+      In = Input
+  ),
+  load_structure(In,XSD,Parse_Options).
 
 
 /**
