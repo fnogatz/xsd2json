@@ -1,4 +1,7 @@
 language: node_js
 node_js:
   - "0.10"
-before_install: sudo apt-get install swi-prolog
+before_install:
+  - sudo apt-add-repository ppa:swi-prolog/stable
+  - sudo apt-get update
+  - sudo apt-get install swi-prolog
