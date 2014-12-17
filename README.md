@@ -6,8 +6,8 @@ node-xsd2json
 *Transform complex XSD schemas into JSON schemas*
 
 **Disclaimer: this is a fork of the original [xsd2json](https://github.com/fnogatz/xsd2json) program.
-It fixes a few issues that we encountered but it is also a few commits behind.
-The first project you should have a look to is the original one.**
+It fixes a few issues that we encountered but it is also a few commits behind on the prolog code.
+The first project you should have a look at is the original one.**
 
 This small program is applied to a XSD file, and performs a few transformations. It is mostly a wrapper to [xsd2json](https://github.com/fnogatz/xsd2json).
 
