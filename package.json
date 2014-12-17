@@ -1,7 +1,7 @@
 {
-  "name": "xsd2json",
-  "version": "0.0.0",
-  "description": "Wrap the original xsd2json prolog programme with pre and post-processing to complet its functionalities.",
+  "name": "xsd2json2",
+  "version": "0.0.1",
+  "description": "Wrap the original xsd2json prolog programme with pre and post-processing to complete its functionalities.",
   "main": "index.js",
   "scripts": {
     "test": "mocha -R spec"
@@ -26,6 +26,6 @@
     "xml2js": "^0.4.4"
   },
   "bin": {
-    "xsd2json": "./bin/xsd2json"
+    "xsd2json2": "./bin/xsd2json"
   }
 }

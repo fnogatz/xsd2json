@@ -17,16 +17,28 @@ This small program is applied to a XSD file, and performs a few transformations.
 Install
 -------
 
-*Not published to NPM yet. You should just clone this repository.*
+To install the command line tool:
 
-    git clone https://github.com/MGDIS/xsd2json
-    cd xsd2json
-    npm install
+    npm install -g xsd2json2
 
-You will also need [SWI Prolog](http://swi-prolog.org/).
+To install as a dependancy in a project:
+
+    npm install xsd2json2
+
+In both cases you will also need [SWI Prolog](http://swi-prolog.org/).
 
 Usage
 -----
 
+As a command line tool:
+
     ./bin/xsd2json --help
     ./bin/xsd2json -v ./test/resources/chapter04ord1.xsd
+
+As a library:
+
+    var xsd2json = require('xsd2json2').xsd2json;
+
+    xsd2json('./users.xsd', function(err, jsonSchema) {
+		fs.writeFile('./users.json', jsonSchema, callback);
+	});
