@@ -2,6 +2,7 @@ node-xsd2json
 =============
 
 [![Build Status](https://travis-ci.org/MGDIS/xsd2json.svg?branch=master)](https://travis-ci.org/MGDIS/xsd2json)
+[![npm version](https://badge.fury.io/js/xsd2json2.svg)](http://badge.fury.io/js/xsd2json2)
 
 *Transform complex XSD schemas into JSON schemas*
 
