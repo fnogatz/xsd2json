@@ -3,17 +3,27 @@
             targetNamespace="http://example.org/ord"
             xmlns:prod="http://example.org/prod">
 
+
+  <xs:group name="orderGroup">
+    <xs:sequence>
+      <xs:element name="id" type="xs:anyURI"/>
+      <xs:element name="aGroupElement" type="xs:token"/>
+    </xs:sequence>
+  </xs:group>
+
   <!-- A complex type representing an order. Is uses types included from other schemas as elements -->
   <xs:complexType name="OrderType">
+    <xs:group ref="orderGroup" />
     <xs:sequence>
       <xs:element name="number" type="OrderNumType"/>
-      <xs:element name="customer" type="CustomerType"/>
-      <xs:element name="items" type="prod:ItemsType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="customer" minOccurs="0"/>
+      <xs:element ref="prod:items" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
   <xs:simpleType name="OrderNumType">
-    <xs:restriction base="xs:string"/>
+    <!-- do not support unions yet. This will simply processed as a string-->
+    <xs:union memberTypes="tns:DefaultTypeFinancementAnterieurType common:AnyNotNullAlphaNumericStringType"/>
   </xs:simpleType>
 
 </xs:schema>

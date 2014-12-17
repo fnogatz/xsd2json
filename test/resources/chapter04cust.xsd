@@ -1,4 +1,5 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://example.org/ord">
+  <xs:element name="customer" type="CustomerType"/>
   <xs:complexType name="CustomerType">
     <xs:sequence>
       <xs:element name="name" type="CustNameType"/>

@@ -17,10 +17,14 @@
   <xs:complexType name="CompletedOrderType">
     <xs:complexContent>
       <xs:extension base="OrderType">
-        <xs:sequence>
-          <xs:element name="date" type="xs:date"/>
-          <xs:element name="paidFor" type="xs:boolean" default="true"/>
-        </xs:sequence>
+        <xs:choice>
+          <xs:sequence>
+            <xs:element name="date" type="xs:date"/>
+          </xs:sequence>
+          <xs:sequence>
+            <xs:element name="anotherChoice" type="xs:boolean"/>
+          </xs:sequence>
+        </xs:choice>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

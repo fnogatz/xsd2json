@@ -12,9 +12,8 @@ var xsdExtensions = require('./lib/xsd-extensions');
 var prologWrapper = require('./lib/prolog-wrapper');
 var jsonProcessing = require('./lib/json-processing');
 
-
 /**
- * @param [string] filePath - the path to the XSD schema file that needs to be tranlated into JSON schema
+ * @param [string] filePath - the path to the XSD schema file that needs to be translated into JSON schema
  */
 exports.xsd2json = function(filePath, callback) {
 	xsdInclusions.mergeInclusions('./', filePath, function(err, schema) {
@@ -22,7 +21,8 @@ exports.xsd2json = function(filePath, callback) {
 		var mergedSchema = xsdExtensions.mergeExtensions(schema);
 		var builder = new xml2js.Builder();
 		var xml = builder.buildObject(mergedSchema);
-		prologWrapper.xsd2jsonWrapper(xml, function(err, schema){
+
+		prologWrapper.xsd2jsonWrapper(xml, function(err, schema) {
 			if (err) return callback(err);
 			callback(null, jsonProcessing.postProcessing(schema));
 		});

@@ -6,6 +6,7 @@ var js = new JaySchema();
 
 var xsd2json = require('../');
 var exampleInstance = require('./resources/example.json');
+var exampleInstance2 = require('./resources/example2.json');
 var schemaResult = require('./resources/schema.json');
 
 describe('node-libxml-xsd', function() {
@@ -13,6 +14,7 @@ describe('node-libxml-xsd', function() {
 	it('should merge a XSD with all its includes', function(done){
 		xsd2json.mergeInclusions('./', './test/resources/chapter04ord1.xsd', function(err, schema){
 			schemaWithInclusions = schema;
+			//console.log(JSON.stringify(schemaWithInclusions, null, 2));
 			done(err);
 		});
 	});
@@ -28,7 +30,7 @@ describe('node-libxml-xsd', function() {
 
 	var jsonSchema;
 	it('should generate a json schema', function(done){
-		this.timeout(5000);
+		this.timeout(10000);
 		xsd2json.xsd2jsonWrapper(mergedSchemaStr, function(err, schema){
 			jsonSchema = JSON.parse(schema);
 			done(err);
@@ -42,6 +44,15 @@ describe('node-libxml-xsd', function() {
 
 	it('should validate the example document against the produced schema', function(){
 		var errors = js.validate(exampleInstance, jsonSchema);
+		if (errors.length > 0) {
+			console.log('Validation errors');
+			console.log(JSON.stringify(errors, null, 2));
+		}
+		errors.should.have.length(0);
+	});
+
+	it('should validate the alternative of the root choice', function(){
+		var errors = js.validate(exampleInstance2, jsonSchema);
 		if (errors.length > 0) {
 			console.log('Validation errors');
 			console.log(JSON.stringify(errors, null, 2));

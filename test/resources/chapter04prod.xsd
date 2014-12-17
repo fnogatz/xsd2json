@@ -1,6 +1,9 @@
 <s:schema xmlns:s="http://www.w3.org/2001/XMLSchema"
             xmlns="http://example.org/prod"
             targetNamespace="http://example.org/prod">
+
+  <xs:element name="items" type="ItemsType"/>
+
   <s:complexType name="ItemsType">
     <s:sequence>
       <s:element name="product" type="ProductType"/>
@@ -9,7 +12,16 @@
   <s:complexType name="ProductType">
     <s:sequence>
       <s:element name="number" type="s:integer"/>
-      <s:element name="name" type="s:string"/>
+
+      <!-- This element bundles its simple type instead of referencing it. -->
+      <s:element name="name">
+        <s:simpleType>
+          <s:restriction base="s:string">
+            <s:pattern value=".{0,256}"/>
+          </s:restriction>
+        </s:simpleType>
+      </s:element>
+
       <s:element name="size" type="SizeType"/>
       <s:element name="color" type="ColorType"/>
     </s:sequence>

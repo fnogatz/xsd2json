@@ -1,7 +1,7 @@
 {
-  "name": "xsd-merger",
+  "name": "xsd2json",
   "version": "0.0.0",
-  "description": "Merge a XSD schema with all its includes and merge extended complex types",
+  "description": "Wrap the original xsd2json prolog programme with pre and post-processing to complet its functionalities.",
   "main": "index.js",
   "scripts": {
     "test": "mocha -R spec"
@@ -26,6 +26,6 @@
     "xml2js": "^0.4.4"
   },
   "bin": {
-    "xsd-merger": "./bin/xsd-merger"
+    "xsd2json2": "./bin/xsd2json"
   }
 }

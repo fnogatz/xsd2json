@@ -6,12 +6,16 @@
     "exampleorgord:CustNameType": {
       "type": "string"
     },
-    "exampleorgord:CompletedOrderType": {
+    "exampleorgprod:name": {
+      "pattern": ".{0,256}",
+      "type": "string"
+    },
+    "exampleorgord:CompletedOrderTypeCHOICE0": {
       "required": [
         "number",
-        "customer",
         "date",
-        "paidFor"
+        "id",
+        "aGroupElement"
       ],
       "type": "object",
       "properties": {
@@ -32,15 +36,21 @@
           "type": "string",
           "format": "date-time"
         },
-        "paidFor": {
-          "type": "boolean"
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "aGroupElement": {
+          "type": "string"
         }
       }
     },
-    "exampleorgord:OrderType": {
+    "exampleorgord:CompletedOrderTypeCHOICE1": {
       "required": [
         "number",
-        "customer"
+        "id",
+        "anotherChoice",
+        "aGroupElement"
       ],
       "type": "object",
       "properties": {
@@ -56,6 +66,16 @@
             "$ref": "#/definitions/exampleorgprod:ItemsType"
           },
           "minItems": 0
+        },
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "anotherChoice": {
+          "type": "boolean"
+        },
+        "aGroupElement": {
+          "type": "string"
         }
       }
     },
@@ -87,13 +107,16 @@
     },
     "exampleorgprod:ProductType": {
       "required": [
+        "name",
         "size",
         "color",
-        "number",
-        "name"
+        "number"
       ],
       "type": "object",
       "properties": {
+        "name": {
+          "$ref": "#/definitions/exampleorgprod:name"
+        },
         "size": {
           "$ref": "#/definitions/exampleorgprod:SizeType"
         },
@@ -102,9 +125,6 @@
         },
         "number": {
           "type": "integer"
-        },
-        "name": {
-          "type": "string"
         }
       }
     },
@@ -126,6 +146,16 @@
         }
       },
       "type": "object"
+    },
+    "exampleorgord:CompletedOrderType": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/exampleorgord:CompletedOrderTypeCHOICE0"
+        },
+        {
+          "$ref": "#/definitions/exampleorgord:CompletedOrderTypeCHOICE1"
+        }
+      ]
     }
   },
   "$ref": "#/definitions/exampleorgord:CompletedOrderType"
