@@ -1,6 +1,8 @@
 node-xsd2json
 =============
 
+[![Build Status](https://travis-ci.org/MGDIS/xsd2json.svg?branch=master)](https://travis-ci.org/MGDIS/xsd2json)
+
 *Transform complex XSD schemas into JSON schemas*
 
 **Disclaimer: this is a fork of the original [xsd2json](https://github.com/fnogatz/xsd2json) program.
