@@ -9,7 +9,7 @@ var exampleInstance = require('./resources/example.json');
 var exampleInstance2 = require('./resources/example2.json');
 var schemaResult = require('./resources/schema.json');
 
-describe('node-libxml-xsd', function() {
+describe('xsd2json', function() {
 	var schemaWithInclusions;
 	it('should merge a XSD with all its includes', function(done){
 		xsd2json.mergeInclusions('./', './test/resources/chapter04ord1.xsd', function(err, schema){
