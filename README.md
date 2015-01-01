@@ -35,13 +35,13 @@ Usage
 
 As a command line tool:
 
-    ./bin/xsd2json --help
-    ./bin/xsd2json -v ./test/resources/chapter04ord1.xsd
+    xsd2json2 --help
+    xsd2json2 -v ./test/resources/chapter04ord1.xsd
 
 As a library:
 
     var xsd2json = require('xsd2json2').xsd2json;
 
     xsd2json('./users.xsd', function(err, jsonSchema) {
-		fs.writeFile('./users.json', jsonSchema, callback);
-	});
+        fs.writeFile('./users.json', jsonSchema, callback);
+    });
