@@ -11,8 +11,8 @@ var schemaResult = require('./resources/schema.json');
 
 describe('xsd2json', function() {
 	var schemaWithInclusions;
-	it('should merge a XSD with all its includes', function(done){
-		xsd2json.mergeInclusions('./', './test/resources/chapter04ord1.xsd', function(err, schema){
+	it('should merge a XSD with all its includes', function(done) {
+		xsd2json.mergeInclusions('./', './test/resources/chapter04ord1.xsd', function(err, schema) {
 			schemaWithInclusions = schema;
 			//console.log(JSON.stringify(schemaWithInclusions, null, 2));
 			done(err);
@@ -21,7 +21,7 @@ describe('xsd2json', function() {
 
 	var mergedSchema;
 	var mergedSchemaStr;
-	it('should merge extensions of complex types', function(){
+	it('should merge extensions of complex types', function() {
 		mergedSchema = xsd2json.mergeExtensions(schemaWithInclusions);
 		//console.log(JSON.stringify(mergedSchema, null, 2));
 		var builder = new xml2js.Builder();
@@ -29,22 +29,24 @@ describe('xsd2json', function() {
 	});
 
 	var jsonSchema;
-	it('should generate a json schema', function(done){
+	it('should generate a json schema', function(done) {
 		this.timeout(10000);
-		xsd2json.xsd2jsonWrapper(mergedSchemaStr, function(err, schema){
+		xsd2json.xsd2jsonWrapper(mergedSchemaStr, function(err, schema) {
 			jsonSchema = JSON.parse(schema);
-			// do not authorize additional properties in this test. It prevents some ambiguities.
-			jsonSchema.definitions['exampleorgord:CompletedOrderType'] = false;
 			done(err);
 		});
 	});
 
-	it('should cure a few defaults of the json schema', function(){
+	it('should cure a few defaults of the json schema', function() {
 		xsd2json.postProcessing(jsonSchema);
 		jsonSchema.should.eql(schemaResult);
 	});
 
-	it('should validate the example document against the produced schema', function(){
+	it('should validate the example document against the produced schema', function() {
+		// do not authorize additional properties in this test. It prevents some ambiguities.
+		jsonSchema.definitions['exampleorgord:CompletedOrderTypeCHOICE0'].additionalProperties = false;
+		jsonSchema.definitions['exampleorgord:CompletedOrderTypeCHOICE1'].additionalProperties = false;
+
 		var errors = js.validate(exampleInstance, jsonSchema);
 		if (errors.length > 0) {
 			console.log('Validation errors');
@@ -53,7 +55,7 @@ describe('xsd2json', function() {
 		errors.should.have.length(0);
 	});
 
-	it('should validate the alternative of the root choice', function(){
+	it('should validate the alternative of the root choice', function() {
 		var errors = js.validate(exampleInstance2, jsonSchema);
 		if (errors.length > 0) {
 			console.log('Validation errors');
