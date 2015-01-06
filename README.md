@@ -28,7 +28,7 @@ To install as a dependancy in a project:
 
     npm install xsd2json2
 
-In both cases you will also need [SWI Prolog](http://swi-prolog.org/).
+In both cases you will also need [SWI Prolog](http://swi-prolog.org/) installed and the swipl executable available in your path.
 
 Usage
 -----
