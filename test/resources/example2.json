@@ -7,6 +7,10 @@
 				"value": 1,
 				"system": "meters"
 			},
+			"sizeSystemsList": {
+				"value": 1,
+				"system": []
+			},
 			"color": {
 				"value": "blue"
 			},

@@ -79,21 +79,6 @@
         }
       }
     },
-    "exampleorgord:CustomerType": {
-      "required": [
-        "name",
-        "number"
-      ],
-      "type": "object",
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/exampleorgord:CustNameType"
-        },
-        "number": {
-          "type": "integer"
-        }
-      }
-    },
     "exampleorgprod:ItemsType": {
       "required": [
         "product"
@@ -109,6 +94,7 @@
       "required": [
         "name",
         "size",
+        "sizeSystemsList",
         "color",
         "number"
       ],
@@ -120,8 +106,26 @@
         "size": {
           "$ref": "#/definitions/exampleorgprod:SizeType"
         },
+        "sizeSystemsList": {
+          "$ref": "#/definitions/exampleorgprod:SizeTypeSystemsList"
+        },
         "color": {
           "$ref": "#/definitions/exampleorgprod:ColorType"
+        },
+        "number": {
+          "type": "integer"
+        }
+      }
+    },
+    "exampleorgord:CustomerType": {
+      "required": [
+        "name",
+        "number"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/exampleorgord:CustNameType"
         },
         "number": {
           "type": "integer"
@@ -136,6 +140,24 @@
       },
       "type": "object"
     },
+    "exampleorgprod:SizeTypeSystemsList": {
+      "properties": {
+        "value": {
+          "type": "integer"
+        },
+        "system": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "type": "object"
+    },
     "exampleorgprod:SizeType": {
       "properties": {
         "system": {
@@ -145,7 +167,10 @@
           "type": "integer"
         }
       },
-      "type": "object"
+      "type": "object",
+      "required": [
+        "value"
+      ]
     },
     "exampleorgord:CompletedOrderType": {
       "anyOf": [

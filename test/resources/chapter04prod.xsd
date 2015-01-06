@@ -22,7 +22,8 @@
         </s:simpleType>
       </s:element>
 
-      <s:element name="size" type="SizeType"/>
+      <s:element name="size" type="SizeType"/>-->
+      <s:element name="sizeSystemsList" type="SizeTypeSystemsList"/>
       <s:element name="color" type="ColorType"/>
     </s:sequence>
   </s:complexType>
@@ -31,6 +32,18 @@
     <s:simpleContent>
       <s:extension base="s:integer">
         <s:attribute name="system" type="s:string"/>
+      </s:extension>
+    </s:simpleContent>
+  </s:complexType>
+
+  <s:complexType name="SizeTypeSystemsList">
+    <s:simpleContent>
+      <s:extension base="s:integer">
+        <s:attribute name="system">
+          <s:simpleType>
+            <s:list itemType="s:string" />
+          </s:simpleType>
+        </s:attribute>
       </s:extension>
     </s:simpleContent>
   </s:complexType>

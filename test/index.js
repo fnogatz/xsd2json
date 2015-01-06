@@ -33,6 +33,8 @@ describe('xsd2json', function() {
 		this.timeout(10000);
 		xsd2json.xsd2jsonWrapper(mergedSchemaStr, function(err, schema){
 			jsonSchema = JSON.parse(schema);
+			// do not authorize additional properties in this test. It prevents some ambiguities.
+			jsonSchema.definitions['exampleorgord:CompletedOrderType'] = false;
 			done(err);
 		});
 	});
