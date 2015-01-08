@@ -338,6 +338,32 @@ xsd_namespaces([Namespace|Namespaces]) :-
 
 
 /**
+ * Add a namespace to all types defined in the `definitions`
+ *   property.
+ */
+add_namespace(json(JSON),_NS,json(JSON)) :-
+  \+lookup(definitions,JSON,_,_).
+
+add_namespace(json(JSON),NS,json(JSON_With_NS)) :-
+  lookup(definitions,JSON,json(Definitions),JSON_Without_Definitions),
+  atom_concat(NS,':',Prefix),
+  prefix_keys(Definitions,Prefix,Prefixed_Definitions),
+  JSON_With_NS = [definitions=json(Prefixed_Definitions)|JSON_Without_Definitions].
+
+
+/**
+ * Add a prefix to all keys in a list of key-value-pairs.
+ *
+ * Examples:
+ *   prefix_keys([a=3,b=1],u,[ua=3,ub=1]).
+ */
+prefix_keys([],_Prefix,[]).
+prefix_keys([Key=Value|Rest],Prefix,[New_Key=Value|RestR]) :-
+  atom_concat(Prefix, Key, New_Key),
+  prefix_keys(Rest,Prefix,RestR).
+
+
+/**
  * cast/3
  * cast(Type,In,Out)
  *
@@ -1612,6 +1638,51 @@ transform(IName_Parent),
   |
     merge_json(Schema_JSON,Include_JSON,JSON),
     json(IName_Parent,Schema_ID,JSON).
+
+
+/**
+ * ##########  XS:IMPORT  ##########
+ */
+
+/**
+ * Call xsd2json for imported schemas.
+ */
+node(IName_Parent,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName_Parent,NS2,import,Import_ID,_Import_Children,Schema_ID),
+    node_attribute(IName_Parent,Import_ID,schemaLocation,Schema_Location,_)
+  ==>
+    xsd_namespaces([NS1,NS2])
+  |
+    /**
+     * Add empty json([]) to hold for schemas that only contain
+     * imports.
+     */
+    json(IName_Parent,Schema_ID,json([])),
+    relative_input(IName_Parent,Schema_Location,Location),
+    xsd2json(Location,_).
+
+
+/**
+ * Merge imported sub-schema.
+ */
+transform(IName_Parent),
+    node(IName_Parent,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName_Parent,NS2,import,Import_ID,_Import_Children,Schema_ID),
+    node_attribute(IName_Parent,Import_ID,schemaLocation,Schema_Location,_),
+    node_attribute(IName_Parent,Import_ID,namespace,Namespace_URI,_)
+  \
+    json(IName_Parent,Schema_ID,Schema_JSON),
+    xsd2json_result(IName_Import,Import_JSON)
+  <=>
+    xsd_namespaces([NS1,NS2]),
+    relative_input(IName_Parent,Schema_Location,Location),
+    input_name(Location,IName_Import),
+    namespace_uri(Import_NS,Namespace_URI)
+  |
+    add_namespace(Import_JSON,Import_NS,Import_JSON_With_NS),
+    merge_json(Schema_JSON,Import_JSON_With_NS,JSON),
+    json(IName_Parent,Schema_ID,JSON).
+
 
 
 /**

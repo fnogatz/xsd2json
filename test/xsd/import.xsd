@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:some="http://example.com/some">
+  <xs:import namespace="http://example.com/some" schemaLocation="simpleType_name.xsd"/>
+</xs:schema>
