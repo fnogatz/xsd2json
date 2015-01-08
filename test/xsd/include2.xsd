@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<xs:schema>
+  <xs:include schemaLocation="simpleType_name.xsd" />
+  <xs:include schemaLocation="complexType_name.xsd" />
+
+  <xs:element name="some">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="dog" type="pets" />
+
+        <xs:element name="cat" type="myType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
