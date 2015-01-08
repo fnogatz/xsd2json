@@ -1586,6 +1586,11 @@ node(IName_Parent,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
   ==>
     xsd_namespaces([NS1,NS2])
   |
+    /**
+     * Add empty json([]) to hold for schemas that only contain
+     * includes.
+     */
+    json(IName_Parent,Schema_ID,json([])),
     relative_input(IName_Parent,Schema_Location,Location),
     xsd2json(Location,_).
 
