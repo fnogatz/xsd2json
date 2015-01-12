@@ -1,117 +1,122 @@
 :- module(xsd2json, [ xsd2json/2, flatten_xsd/1 ]).
 :- use_module(merge_json).
 :- use_module(library(chr)).
+:- use_module(library(http/http_open)).
+:- use_module(library(url)).
 
 
 /**
- * transform/0
+ * transform/1
  * [CHR-Constraint]
  *
  * Constraint to trigger the transformation process.
  */
-:- chr_constraint transform/0.
+:- chr_constraint transform/1.
 
 
 /**
- * build_schema/0
+ * build_schema/1
  * [CHR-Constraint]
  *
  * Constraint to trigger the build process of the global
  *   JSON Schema, i.e. create inline JSON Schemas.
  */
-:- chr_constraint build_schema/0.
-build_schema
+:- chr_constraint build_schema/1.
+build_schema(IName)
   \
-    transform
+    transform(IName)
   <=>
     true.
 
 
 /**
- * json/2
- * json(ID,json(JSON))
+ * json/3
+ * json(IName,ID,json(JSON))
  * [CHR-Constraint]
  *
- * The `json/2` constraints holds the `JSON` entity for the
+ * The `json/3` constraints holds the `JSON` entity for the
  *   XSD object with the same `ID`.
  */
-:- chr_constraint json/2.
+:- chr_constraint json/3.
 
 /**
  * Merge two JSONs of the same `ID`.
  */
-json(ID,JSON1), 
-    json(ID,JSON2) 
+json(IName,ID,JSON1), 
+    json(IName,ID,JSON2) 
   <=> 
     merge_json(JSON1,JSON2,JSON)
   |
-    json(ID,JSON).
+    json(IName,ID,JSON).
 
 
 /**
- * json_created/2
- * json_created(ID,List_Of_Children_IDs)
+ * json_created/3
+ * json_created(IName,ID,List_Of_Children_IDs)
  * [CHR-Constraint]
  *
- * The `json_created/2` holds a `List_Of_Children_IDs`
+ * The `json_created/3` holds a `List_Of_Children_IDs`
  *   of children nodes of the given `ID` for which
  *   already `json/2` constraints has been generated.
  */
-:- chr_constraint json_created/2.
+:- chr_constraint json_created/3.
 
 /**
- * Merge two `json_created/2` constraints of the same ID.
+ * Merge two `json_created/3` constraints of the same ID.
  */
-json_created(ID,List1), 
-    json_created(ID,List2)
+json_created(IName,ID,List1), 
+    json_created(IName,ID,List2)
   <=>
     union(List1,List2,Union),
-    json_created(ID,Union).
+    json_created(IName,ID,Union).
+
+
+:- chr_constraint xsd2json_result/2.
 
 
 /**
- * Propagate for each created JSON a `json_created/2`
+ * Propagate for each created JSON a `json_created`
  *   constraint for the parent node.
  */
-json(ID,_JSON),
-    node(_Namespace,_Name,ID,_Siblings,Parent_ID)
+json(IName,ID,_JSON),
+    node(IName,_Namespace,_Name,ID,_Siblings,Parent_ID)
   ==>
-    json_created(Parent_ID,[ID]).
+    json_created(IName,Parent_ID,[ID]).
 
 
 /**
- * schema_definition/3
- * schema_definition(Schema_Name,ID,JSON)
+ * schema_definition/4
+ * schema_definition(IName,Schema_Name,ID,JSON)
  * [CHR-Constraint]
  *
  * Definition of a inline JSON Schema, assigned to
  *   the node of `ID`.
  */
-:- chr_constraint schema_definition/3.
+:- chr_constraint schema_definition/4.
 
-schema_definition(Name,ID,JSON1),
-    schema_definition(Name,ID,JSON2)
+schema_definition(IName,Name,ID,JSON1),
+    schema_definition(IName,Name,ID,JSON2)
   <=>
     merge_json(JSON1,JSON2,JSON)
   |
-    schema_definition(Name,ID,JSON).
+    schema_definition(IName,Name,ID,JSON).
 
 
 /**
- * node/5
- * node(Namespace,Name,ID,Children_IDs,Parent_ID)
+ * node/6
+ * node(IName,Namespace,Name,ID,Children_IDs,Parent_ID)
  * [CHR-Constraint]
  *
  * Hold the node's information like its `Name`, `Namespace`,
  *   `ID` and children as well as the `Parent_ID` of its
  *   parent node.
  */
-:- chr_constraint node/5.
+:- chr_constraint node/6.
 
 
 /**
- * node_attribute/4
- * node_attribute(ID,Key,Value,Source)
+ * node_attribute/5
+ * node_attribute(IName,ID,Key,Value,Source)
  * [CHR-Constraint]
  *
  * Hold the attribute of the node of `ID`as a 
@@ -121,28 +126,28 @@ schema_definition(Name,ID,JSON1),
  * Note: The `Value` is always a string.
  *
  * Examples:
- *   node_attribute(_Some_ID,minOccurs,'1',default).
+ *   node_attribute('file.xsd',_Some_ID,minOccurs,'1',default).
  */
-:- chr_constraint node_attribute/4.
+:- chr_constraint node_attribute/5.
 
 % remove default attributes if the source already contains
 %   it
-node_attribute(ID,Key,_Value_Kept,source)
+node_attribute(IName,ID,Key,_Value_Kept,source)
   \ 
-    node_attribute(ID,Key,_Value_Removed,default) 
+    node_attribute(IName,ID,Key,_Value_Removed,default) 
   <=>
     true.
 
 
 /**
- * text_node/3
- * text_node(ID,Text,Parent_ID)
+ * text_node/4
+ * text_node(Input_Name,ID,Text,Parent_ID)
  * [CHR-Constraint]
  *
  * Representation of a XML text node like it is used
  *   in `<xs:documentation>My Documentation</xs:documentation>`
  */
-:- chr_constraint text_node/3.
+:- chr_constraint text_node/4.
 
 
 /**
@@ -192,8 +197,18 @@ parse_options([
  *   load_xsd(stream(user_input),XSD).  %% binds XSD to the DOM tree
  */
 load_xsd(Input,XSD) :- 
-  parse_options(Parse_Options), 
-  load_structure(Input,XSD,Parse_Options).
+  parse_options(Parse_Options),
+  (
+      (
+          string_concat('http://',_,Input)
+        ; 
+          string_concat('https://',_,Input)
+      ),
+      http_open:http_open(Input,In,[])
+    ;
+      In = Input
+  ),
+  load_structure(In,XSD,Parse_Options).
 
 
 /**
@@ -210,7 +225,8 @@ load_xsd(Input,XSD) :-
 flatten_xsd(Input) :- 
   load_xsd(Input,XSD),
   root_id(Root_ID),
-  xsd_flatten_nodes(Root_ID,0,XSD,_Children_IDs).
+  input_name(Input,Input_Name),
+  xsd_flatten_nodes(Input_Name,Root_ID,0,XSD,_Children_IDs).
 
 
 /**
@@ -224,12 +240,27 @@ flatten_xsd(Input) :-
 xsd2json(Input,Result) :- 
   load_xsd(Input,XSD),
   root_id(Root_ID),
-  xsd_flatten_nodes(Root_ID,0,XSD,Children_IDs),
-  transform,
+  input_name(Input,Input_Name),
+  xsd_flatten_nodes(Input_Name,Root_ID,0,XSD,Children_IDs),
+  transform(Input_Name),
   Children_IDs = [First_Element|_],
-  build_schema,
-  get_json(First_Element,JSON),
-  remove_at_from_property_names(JSON,Result).
+  build_schema(Input_Name),
+  get_json(Input_Name,First_Element,JSON),
+  remove_at_from_property_names(JSON,Result),
+  xsd2json_result(Input_Name,Result).
+
+
+/**
+ * input_name/2.
+ *
+ * Create an Input_Name for a given input resource.
+ */
+input_name(stream(A),R) :-
+  string_concat('stream_',A,R).
+input_name(Input,Input) :-
+  is_absolute_url(Input).
+input_name(Filepath,Abs_Filepath) :-
+  absolute_file_name(Filepath,Abs_Filepath).
 
 
 /**
@@ -307,6 +338,32 @@ xsd_namespaces([Namespace|Namespaces]) :-
 
 
 /**
+ * Add a namespace to all types defined in the `definitions`
+ *   property.
+ */
+add_namespace(json(JSON),_NS,json(JSON)) :-
+  \+lookup(definitions,JSON,_,_).
+
+add_namespace(json(JSON),NS,json(JSON_With_NS)) :-
+  lookup(definitions,JSON,json(Definitions),JSON_Without_Definitions),
+  atom_concat(NS,':',Prefix),
+  prefix_keys(Definitions,Prefix,Prefixed_Definitions),
+  JSON_With_NS = [definitions=json(Prefixed_Definitions)|JSON_Without_Definitions].
+
+
+/**
+ * Add a prefix to all keys in a list of key-value-pairs.
+ *
+ * Examples:
+ *   prefix_keys([a=3,b=1],u,[ua=3,ub=1]).
+ */
+prefix_keys([],_Prefix,[]).
+prefix_keys([Key=Value|Rest],Prefix,[New_Key=Value|RestR]) :-
+  atom_concat(Prefix, Key, New_Key),
+  prefix_keys(Rest,Prefix,RestR).
+
+
+/**
  * cast/3
  * cast(Type,In,Out)
  *
@@ -381,6 +438,18 @@ to_number(Number,Number) :-
 string_concat([],'').
 string_concat([A],A).
 string_concat([A,B|Bs],Result) :- string_concat(A,B,Temp), string_concat([Temp|Bs],Result).
+
+
+/**
+ * relative_input/3
+ *
+ * Examples:
+ *   relative_input('../test/a.xsd','b.xsd','../test/b.xsd').
+ *   relative_input('http://localhost/a.xsd','b.xsd','http://localhost/b.xsd').
+ */
+relative_input(Base,Relative,Res) :-
+  file_directory_name(Base,Dir),
+  directory_file_path(Dir,Relative,Res).
 
 
 /**
@@ -541,52 +610,52 @@ first_id(ID) :-
 
 
 /**
- * xsd_flatten_nodes/4
+ * xsd_flatten_nodes/5
  *
- * Flatten a XSD DOM tree by creating `node/4`,
+ * Flatten a XSD DOM tree by creating `node/5`,
  *   `attribute/`
- *   and `text_node/2` constraints.
+ *   and `text_node/3` constraints.
  */
-xsd_flatten_nodes(_Base_ID,_Pos,[],[]).
+xsd_flatten_nodes(_IName,_Base_ID,_Pos,[],[]).
 
-xsd_flatten_nodes(Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
+xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
   Node = element(Node_Type,Node_Attributes,Child_Nodes),  %% is an XML node, no text
   new_id(Base_ID,Pos,ID),
   namespace(Node_Type,Namespace,Node_Type_Without_NS),
   % flatten the node's attributes
-  xsd_flatten_attributes(ID,Node_Attributes),
-  node(Namespace,Node_Type_Without_NS,ID,Children_IDs,Base_ID),
+  xsd_flatten_attributes(IName,ID,Node_Attributes),
+  node(IName,Namespace,Node_Type_Without_NS,ID,Children_IDs,Base_ID),
   % flatten sibling nodes
   Next_Pos is Pos+1,
-  xsd_flatten_nodes(Base_ID,Next_Pos,Nodes,Sibling_IDs),
+  xsd_flatten_nodes(IName,Base_ID,Next_Pos,Nodes,Sibling_IDs),
   % flatten all children
-  xsd_flatten_nodes(ID,0,Child_Nodes,Children_IDs).
+  xsd_flatten_nodes(IName,ID,0,Child_Nodes,Children_IDs).
 
-xsd_flatten_nodes(Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
+xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
   atom(Node),  %% is simply a text node
   new_id(Base_ID,Pos,ID),
-  text_node(ID,Node,Base_ID),
+  text_node(IName,ID,Node,Base_ID),
   % flatten sibling nodes
   Next_Pos is Pos+1,
-  xsd_flatten_nodes(Base_ID,Next_Pos,Nodes,Sibling_IDs).
+  xsd_flatten_nodes(IName,Base_ID,Next_Pos,Nodes,Sibling_IDs).
 
 
 /**
- * xsd_flatten_attributes/2
- * xsd_flatten_attributes(ID,List_Of_Attributes)
+ * xsd_flatten_attributes/3
+ * xsd_flatten_attributes(IName,ID,List_Of_Attributes)
  *
  * Flatten a `List_Of_Attributes` of the form
- *   [attribute1=valu1,attribute2=value2,...]
- *   by creating a `node_attribute/3` constraints.
+ *   [attribute1=value1,attribute2=value2,...]
+ *   by creating `node_attribute/4` constraints.
  *
  * Examples:
- *   xsd_flatten_attributes([0],[minOccurs='1'])
- *     ==> node_attribute([0],minOccurs,'1')
+ *   xsd_flatten_attributes('file.xsd',[0],[minOccurs='1'])
+ *     ==> node_attribute('file.xsd',[0],minOccurs,'1')
  */
-xsd_flatten_attributes(_ID,[]).
-xsd_flatten_attributes(ID,[Attribute=Value|List_Of_Attributes]) :-
-  node_attribute(ID,Attribute,Value,source),
-  xsd_flatten_attributes(ID,List_Of_Attributes).
+xsd_flatten_attributes(_IName,_ID,[]).
+xsd_flatten_attributes(IName,ID,[Attribute=Value|List_Of_Attributes]) :-
+  node_attribute(IName,ID,Attribute,Value,source),
+  xsd_flatten_attributes(IName,ID,List_Of_Attributes).
 
 
 /**
@@ -757,7 +826,7 @@ sum_occurs(A,B,Res) :-
  * remove_xsd_element/1
  * remove_xsd_element(Element_Name)
  */
-node(Namespace,Name,_ID,_Children,_Parent_ID) 
+node(_IName,Namespace,Name,_ID,_Children,_Parent_ID) 
   <=>
     remove_xsd_element(Name),
     xsd_namespace(Namespace)
@@ -766,31 +835,31 @@ node(Namespace,Name,_ID,_Children,_Parent_ID)
 
 
 /**
- * remove_node/1
- * remove_node(ID)
+ * remove_node/2
+ * remove_node(IName,ID)
  * [CHR-Constraint]
  *
- * Remove a `node/4` constraint and its `node_attribute/4`
+ * Remove a `node` constraint and its `node_attribute`
  *   constraints as well as its children nodes.
  */
-:- chr_constraint remove_node/1.
-remove_node(ID)
+:- chr_constraint remove_node/2.
+remove_node(IName,ID)
   \ 
-    node_attribute(ID,_,_,_) 
+    node_attribute(IName,ID,_,_,_) 
   <=> 
     true.
 
-remove_node(ID)
+remove_node(IName,ID)
   \ 
-    node(Parent_Namespace,Parent_Name,Parent_ID,Siblings,Parent_Parent_ID) 
+    node(IName,Parent_Namespace,Parent_Name,Parent_ID,Siblings,Parent_Parent_ID) 
   <=> 
     member(ID,Siblings), 
     delete(Siblings,ID,Siblings_Without_ID)
   |
-    node(Parent_Namespace,Parent_Name,Parent_ID,Siblings_Without_ID,Parent_Parent_ID).
+    node(IName,Parent_Namespace,Parent_Name,Parent_ID,Siblings_Without_ID,Parent_Parent_ID).
 
-remove_node(ID) \ json(ID,_) <=> true.
-remove_node(ID) \ node(_,_,ID,Children,_) <=> remove_nodes(Children).
+remove_node(IName,ID) \ json(IName,ID,_) <=> true.
+remove_node(IName,ID) \ node(IName,_,_,ID,Children,_) <=> remove_nodes(IName,Children).
 
 
 /**
@@ -800,17 +869,17 @@ remove_node(ID) \ node(_,_,ID,Children,_) <=> remove_nodes(Children).
  * Remove a list of `node/4` constraints by use of
  *   the `remove_node/1` constraint.
  */
-remove_nodes([]).
-remove_nodes([ID|Rest]) :- 
-  remove_node(ID),
-  remove_nodes(Rest).
+remove_nodes(_IName,[]).
+remove_nodes(IName,[ID|Rest]) :- 
+  remove_node(IName,ID),
+  remove_nodes(IName,Rest).
 
 
 /**
- * ##### DO BEFORE transform/0 #####
+ * ##### DO BEFORE transform/1 #####
  * 
  * Manipulations which has to be done before
- *   the conversion starts, i.e. before the `transform/0`
+ *   the conversion starts, i.e. before the `transform/1`
  *   constrains was added.
  */
 
@@ -818,27 +887,27 @@ remove_nodes([ID|Rest]) :-
  * Combine multiple `xs:element` within a `xs:sequence`
  *   with the same `Name` and `Type`.
  */
-node(NS1,sequence,Sequence_ID,_Sequence_Children,_Sequence_Parent_ID),
-    node_attribute(Element_1_ID,name,Name,_),
-    node_attribute(Element_1_ID,type,Type,_)
+node(IName,NS1,sequence,Sequence_ID,_Sequence_Children,_Sequence_Parent_ID),
+    node_attribute(IName,Element_1_ID,name,Name,_),
+    node_attribute(IName,Element_1_ID,type,Type,_)
   \
-    node(NS2,element,Element_1_ID,Element_1_Children,Sequence_ID),
-    node(NS3,element,Element_2_ID,_Element_2_Children,Sequence_ID),
-    node_attribute(Element_2_ID,name,Name,_),
-    node_attribute(Element_2_ID,type,Type,_),
-    node_attribute(Element_1_ID,minOccurs,MinOccurs_1,_),
-    node_attribute(Element_1_ID,maxOccurs,MaxOccurs_1,_),
-    node_attribute(Element_2_ID,minOccurs,MinOccurs_2,_),
-    node_attribute(Element_2_ID,maxOccurs,MaxOccurs_2,_)
+    node(IName,NS2,element,Element_1_ID,Element_1_Children,Sequence_ID),
+    node(IName,NS3,element,Element_2_ID,_Element_2_Children,Sequence_ID),
+    node_attribute(IName,Element_2_ID,name,Name,_),
+    node_attribute(IName,Element_2_ID,type,Type,_),
+    node_attribute(IName,Element_1_ID,minOccurs,MinOccurs_1,_),
+    node_attribute(IName,Element_1_ID,maxOccurs,MaxOccurs_1,_),
+    node_attribute(IName,Element_2_ID,minOccurs,MinOccurs_2,_),
+    node_attribute(IName,Element_2_ID,maxOccurs,MaxOccurs_2,_)
   <=>
     xsd_namespaces([NS1,NS2,NS3]),
     sum_occurs(MinOccurs_1,MinOccurs_2,MinOccurs),
     sum_occurs(MaxOccurs_1,MaxOccurs_2,MaxOccurs)
   |
-    remove_node(Element_2_ID),
-    node(NS1,element,Element_1_ID,Element_1_Children,Sequence_ID),
-    node_attribute(Element_1_ID,minOccurs,MinOccurs,source),
-    node_attribute(Element_1_ID,maxOccurs,MaxOccurs,source).
+    remove_node(IName,Element_2_ID),
+    node(IName,NS1,element,Element_1_ID,Element_1_Children,Sequence_ID),
+    node_attribute(IName,Element_1_ID,minOccurs,MinOccurs,source),
+    node_attribute(IName,Element_1_ID,maxOccurs,MaxOccurs,source).
 
 
 /**
@@ -848,19 +917,19 @@ node(NS1,sequence,Sequence_ID,_Sequence_Children,_Sequence_Parent_ID),
  *   http://www.w3.org/TR/xmlschema-2/#src-multiple-patterns
  *   they are ORed.
  */
-node(NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Parent_ID)
+node(IName,NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Parent_ID)
   \
-    node(NS2,pattern,Pattern_1_ID,Pattern_1_Children,Restriction_ID),
-    node(NS3,pattern,Pattern_2_ID,_Pattern_2_Children,Restriction_ID),
-    node_attribute(Pattern_1_ID,value,Pattern_1,_),
-    node_attribute(Pattern_2_ID,value,Pattern_2,_)
+    node(IName,NS2,pattern,Pattern_1_ID,Pattern_1_Children,Restriction_ID),
+    node(IName,NS3,pattern,Pattern_2_ID,_Pattern_2_Children,Restriction_ID),
+    node_attribute(IName,Pattern_1_ID,value,Pattern_1,_),
+    node_attribute(IName,Pattern_2_ID,value,Pattern_2,_)
   <=>
     xsd_namespaces([NS1,NS2,NS3]),
     string_concat(['(',Pattern_1,'|',Pattern_2,')'],New_Pattern)
   |
-    remove_node(Pattern_2_ID),
-    node(NS2,pattern,Pattern_1_ID,Pattern_1_Children,Restriction_ID),
-    node_attribute(Pattern_1_ID,value,New_Pattern,source).
+    remove_node(IName,Pattern_2_ID),
+    node(IName,NS2,pattern,Pattern_1_ID,Pattern_1_Children,Restriction_ID),
+    node_attribute(IName,Pattern_1_ID,value,New_Pattern,source).
 
 
 /**
@@ -880,7 +949,7 @@ node(NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Parent_ID
  * ## Set defaults ##
  *
  * Note: This will already be executed without the 
- *   `transform/0` constraint being added.
+ *   `transform/1` constraint being added.
  */
 
 /**
@@ -893,50 +962,50 @@ node(NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Parent_ID
  *   This can be ignored as it will have no effect for
  *   those elements.
  */
-node(Namespace,element,Element_ID,_Element_Children,_Parent_ID) 
+node(IName,Namespace,element,Element_ID,_Element_Children,_Parent_ID) 
   ==>
     xsd_namespace(Namespace) 
   |
-    node_attribute(Element_ID,minOccurs,'1',default).
+    node_attribute(IName,Element_ID,minOccurs,'1',default).
 
-node(Namespace,element,Element_ID,_Element_Children,_Parent_ID) 
+node(IName,Namespace,element,Element_ID,_Element_Children,_Parent_ID) 
   ==>
     xsd_namespace(Namespace)
   |
-    node_attribute(Element_ID,maxOccurs,'1',default).
+    node_attribute(IName,Element_ID,maxOccurs,'1',default).
 
 
 /**
  * Add `use` attribute to all `xs:attribute` XSD nodes.
  *   Default is `optional`.
  */
-node(Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
+node(IName,Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
   ==>
     xsd_namespace(Namespace)
   |
-    node_attribute(Attribute_ID,use,optional,default).
+    node_attribute(IName,Attribute_ID,use,optional,default).
 
 
 /**
  * Add `fixed` attribute to all `xs:attribute` XSD nodes.
  *   Default is not set, i.e. `var(Fixed)`.
  */
-node(Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
+node(IName,Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
   ==>
     xsd_namespace(Namespace)
   |
-    node_attribute(Attribute_ID,fixed,_Unbound,default).
+    node_attribute(IName,Attribute_ID,fixed,_Unbound,default).
 
 
 /**
  * Add `default` attribute to all `xs:attribute` XSD nodes.
  *   Default is not set, i.e. `var(Default)`.
  */
-node(Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
+node(IName,Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
   ==>
     xsd_namespace(Namespace)
   |
-    node_attribute(Attribute_ID,default,_Unbound,default).
+    node_attribute(IName,Attribute_ID,default,_Unbound,default).
 
 
 /**
@@ -946,22 +1015,22 @@ node(Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
  * This `id` isn't used yet as there is no equivalent in
  *   JSON Schema.
  */
-node(Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
+node(IName,Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
   ==>
     xsd_namespace(Namespace)
   |
-    node_attribute(Attribute_ID,id,_Unbound,default).
+    node_attribute(IName,Attribute_ID,id,_Unbound,default).
 
 
 /**
  * Add `type` attribute to all `xs:attribute` XSD nodes.
  *   Default is not set, i.e. `var(Type)`.
  */
-node(Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
+node(IName,Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
   ==>
     xsd_namespace(Namespace)
   |
-    node_attribute(Attribute_ID,type,_Unbound,default).
+    node_attribute(IName,Attribute_ID,type,_Unbound,default).
 
 
 /**
@@ -972,16 +1041,16 @@ node(Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
  * Every restriction has at least its base type in an `base=Base`
  *   attribute.
  */
-transform, 
-    node(Namespace,restriction,ID,_Children,_Parent_ID),
-    node_attribute(ID,base,Base,_)
+transform(IName), 
+    node(IName,Namespace,restriction,ID,_Children,_Parent_ID),
+    node_attribute(IName,ID,base,Base,_)
   ==>
     xsd_namespace(Namespace),
     namespace(Base,Base_Namespace,Base_Type),
     xsd_namespace(Base_Namespace),
     convert_xsd_type(Base_Type,JSON)
   |
-    json(ID,JSON).
+    json(IName,ID,JSON).
 
 
 /**
@@ -991,14 +1060,14 @@ transform,
 /**
  * `xs:enumeration` element as child of a `xs:restriction` node.
  */
-transform, 
-    node(NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Parent_ID),
-    node(NS2,enumeration,Enumeration_ID,_Enumeration_Children,Restriction_ID),
-    node_attribute(Enumeration_ID,value,Value,_)
+transform(IName), 
+    node(IName,NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Parent_ID),
+    node(IName,NS2,enumeration,Enumeration_ID,_Enumeration_Children,Restriction_ID),
+    node_attribute(IName,Enumeration_ID,value,Value,_)
   ==>
     xsd_namespaces([NS1,NS2])
   |
-    json(Restriction_ID,json([enum=[Value]])).
+    json(IName,Restriction_ID,json([enum=[Value]])).
 
 
 /**
@@ -1017,15 +1086,15 @@ transform,
  *   while the specification also mentions date and time
  *   facets.
  */
-transform, 
-    node(NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Parent_ID),
-    node(NS2,Constraint_Name_XSD,Constraint_ID,_Constraint_Children,Restriction_ID),
-    node_attribute(Constraint_ID,value,Value,_)
+transform(IName), 
+    node(IName,NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Parent_ID),
+    node(IName,NS2,Constraint_Name_XSD,Constraint_ID,_Constraint_Children,Restriction_ID),
+    node_attribute(IName,Constraint_ID,value,Value,_)
   ==>
     xsd_namespaces([NS1,NS2]),
     convert_xsd_restriction(Constraint_Name_XSD,Value,json(JSON_List))
   |
-    json(Restriction_ID,json(JSON_List)).
+    json(IName,Restriction_ID,json(JSON_List)).
 
 
 /**
@@ -1035,42 +1104,42 @@ transform,
 /**
  * `xs:element` with `fixed` attribute set.
  */
-transform,
-    node(Namespace,element,ID,_Children,_Element_Parent_ID),
-    node_attribute(ID,fixed,Fixed,_)
+transform(IName), 
+    node(IName,Namespace,element,ID,_Children,_Element_Parent_ID),
+    node_attribute(IName,ID,fixed,Fixed,_)
   ==>
     xsd_namespace(Namespace)
   |
-    json(ID,json([enum=[Fixed]])).
+    json(IName,ID,json([enum=[Fixed]])).
 
 
 /**
  * `xs:element` with `type` attribute set which can be
  *   translated to a primitive JSON Schema type.
  */
-transform,
-    node(Namespace,element,ID,_Children,_Element_Parent_ID),
-    node_attribute(ID,type,Type_With_NS,_)
+transform(IName), 
+    node(IName,Namespace,element,ID,_Children,_Element_Parent_ID),
+    node_attribute(IName,ID,type,Type_With_NS,_)
   ==>
     xsd_namespace(Namespace),
     valid_xsd_type(Type_With_NS,Type)
   |
     convert_xsd_type(Type,JSON),
-    json(ID,JSON).
+    json(IName,ID,JSON).
 
 
 /**
  * `xs:element` with `type` attribute set which must be
  *   self defined.
  */
-transform,
-    node(Namespace,element,ID,_Children,_Element_Parent_ID),
-    node_attribute(ID,type,Type_With_NS,_)
+transform(IName), 
+    node(IName,Namespace,element,ID,_Children,_Element_Parent_ID),
+    node_attribute(IName,ID,type,Type_With_NS,_)
   ==>
     xsd_namespace(Namespace),
     \+valid_xsd_type(Type_With_NS,_Type)
   |
-    json(ID,json([type=Type_With_NS])).
+    json(IName,ID,json([type=Type_With_NS])).
 
 
 /**
@@ -1082,31 +1151,31 @@ transform,
  * Convert a `xs:annotation/xs:documentation` within a
  *   `xs:element` node.
  */
-transform,
-    node(NS1,element,Element_ID,_Element_Children,_Element_Parent_ID),
-    node(NS2,annotation,Annotation_ID,_Annotation_Children,Element_ID),
-    node(NS3,documentation,Documentation_ID,_Documentation_Children,Annotation_ID),
-    text_node(_Text_Node_ID,Text,Documentation_ID)
+transform(IName), 
+    node(IName,NS1,element,Element_ID,_Element_Children,_Element_Parent_ID),
+    node(IName,NS2,annotation,Annotation_ID,_Annotation_Children,Element_ID),
+    node(IName,NS3,documentation,Documentation_ID,_Documentation_Children,Annotation_ID),
+    text_node(IName,_Text_Node_ID,Text,Documentation_ID)
   ==> 
     xsd_namespaces([NS1,NS2,NS3])
   |
-    json(Element_ID,json([description=Text])).
+    json(IName,Element_ID,json([description=Text])).
 
 
 /**
  * Convert a `xs:annotation/xs:documentation` within a
  *   `xs:simpleType` node which has a `@name` attribute set.
  */
-transform,
-    node(NS1,simpleType,SimpleType_ID,_SimpleType_Children,_SimpleType_Parent_ID),
-    node_attribute(SimpleType_ID,name,_Name,_),
-    node(NS2,annotation,Annotation_ID,_Annotation_Children,SimpleType_ID),
-    node(NS3,documentation,Documentation_ID,_Documentation_Children,Annotation_ID),
-    text_node(_Text_Node_ID,Text,Documentation_ID)
+transform(IName), 
+    node(IName,NS1,simpleType,SimpleType_ID,_SimpleType_Children,_SimpleType_Parent_ID),
+    node_attribute(IName,SimpleType_ID,name,_Name,_),
+    node(IName,NS2,annotation,Annotation_ID,_Annotation_Children,SimpleType_ID),
+    node(IName,NS3,documentation,Documentation_ID,_Documentation_Children,Annotation_ID),
+    text_node(IName,_Text_Node_ID,Text,Documentation_ID)
   ==> 
     xsd_namespaces([NS1,NS2,NS3])
   |
-    json(SimpleType_ID,json([description=Text])).
+    json(IName,SimpleType_ID,json([description=Text])).
 
 
 /**
@@ -1155,13 +1224,13 @@ is_required_property('1',_).
  *   definition) and `MaxOccurs` (1) values by use of the 
  *   `is_required_property/2` predicate.
  */
-transform, 
-    node(NS1,all,All_ID,_All_Children,_All_Parent_ID),
-    node(NS2,element,Element_ID,_Element_Children,All_ID),
-    json(Element_ID,Element_JSON),
-    node_attribute(Element_ID,minOccurs,MinOccurs,_),
-    node_attribute(Element_ID,maxOccurs,MaxOccurs,_),
-    node_attribute(Element_ID,name,Element_Name,_) 
+transform(IName), 
+    node(IName,NS1,all,All_ID,_All_Children,_All_Parent_ID),
+    node(IName,NS2,element,Element_ID,_Element_Children,All_ID),
+    json(IName,Element_ID,Element_JSON),
+    node_attribute(IName,Element_ID,minOccurs,MinOccurs,_),
+    node_attribute(IName,Element_ID,maxOccurs,MaxOccurs,_),
+    node_attribute(IName,Element_ID,name,Element_Name,_) 
   ==>
     xsd_namespaces([NS1,NS2])
   |
@@ -1174,7 +1243,7 @@ transform,
         \+is_required_property(MinOccurs,MaxOccurs), 
         Full_JSON = JSON
     ),
-    json(All_ID,json(Full_JSON)).
+    json(IName,All_ID,json(Full_JSON)).
 
 
 /**
@@ -1185,13 +1254,13 @@ transform,
  * `xs:element` within a `xs:sequence` with the `maxOccurs` attribute
  *   set to '1' and `minOccurs` to '0' or '1'.
  */
-transform,
-    node(NS1,sequence,Sequence_ID,_Sequence_Children,_Sequence_Parent_ID),
-    node(NS2,element,Element_ID,_Element_Children,Sequence_ID),
-    json(Element_ID,Element_JSON),
-    node_attribute(Element_ID,minOccurs,MinOccurs,_),
-    node_attribute(Element_ID,maxOccurs,'1',_),
-    node_attribute(Element_ID,name,Element_Name,_)
+transform(IName), 
+    node(IName,NS1,sequence,Sequence_ID,_Sequence_Children,_Sequence_Parent_ID),
+    node(IName,NS2,element,Element_ID,_Element_Children,Sequence_ID),
+    json(IName,Element_ID,Element_JSON),
+    node_attribute(IName,Element_ID,minOccurs,MinOccurs,_),
+    node_attribute(IName,Element_ID,maxOccurs,'1',_),
+    node_attribute(IName,Element_ID,name,Element_Name,_)
   ==>
     xsd_namespaces([NS1,NS2])
   |
@@ -1200,20 +1269,20 @@ transform,
     % add `required=[...]` if `minOccurs` = 1
     (MinOccurs = '0', Full_JSON = JSON;
       MinOccurs = '1', Full_JSON = [required=[Element_Name]|JSON]),
-    json(Sequence_ID,json(Full_JSON)).
+    json(IName,Sequence_ID,json(Full_JSON)).
 
 
 /**
  * `xs:element` within a `xs:sequence` with the `maxOccurs` attribute
  *   set to 'unbounded' or >= 2.
  */
-transform,
-    node(NS1,sequence,Sequence_ID,_Sequence_Children,_Sequence_Parent_ID),
-    node(NS2,element,Element_ID,_Element_Children,Sequence_ID),
-    json(Element_ID,Element_JSON),
-    node_attribute(Element_ID,minOccurs,MinOccurs,_),
-    node_attribute(Element_ID,maxOccurs,MaxOccurs,_),
-    node_attribute(Element_ID,name,Element_Name,_)
+transform(IName), 
+    node(IName,NS1,sequence,Sequence_ID,_Sequence_Children,_Sequence_Parent_ID),
+    node(IName,NS2,element,Element_ID,_Element_Children,Sequence_ID),
+    json(IName,Element_ID,Element_JSON),
+    node_attribute(IName,Element_ID,minOccurs,MinOccurs,_),
+    node_attribute(IName,Element_ID,maxOccurs,MaxOccurs,_),
+    node_attribute(IName,Element_ID,name,Element_Name,_)
   ==>
     xsd_namespaces([NS1,NS2]),
     to_number(MinOccurs,MinOccurs_Number),
@@ -1244,7 +1313,7 @@ transform,
     % add `required=[...]` if `minOccurs` > 0
     (MinOccurs_Number >= 1, Full_JSON = [required=[Element_Name]|JSON];
       MinOccurs_Number < 1, Full_JSON = JSON),
-    json(Sequence_ID,json(Full_JSON)).
+    json(IName,Sequence_ID,json(Full_JSON)).
 
 
 /**
@@ -1254,27 +1323,27 @@ transform,
 /**
  * `xs:complexType` which has a `xs:all` child.
  */
-transform,
-    node(NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-    node(NS2,all,All_ID,_All_Children,ComplexType_ID),
-    json(All_ID,All_JSON)
+transform(IName), 
+    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
+    node(IName,NS2,all,All_ID,_All_Children,ComplexType_ID),
+    json(IName,All_ID,All_JSON)
   ==>
     xsd_namespaces([NS1,NS2])
   |
-    json(ComplexType_ID,All_JSON).
+    json(IName,ComplexType_ID,All_JSON).
 
 
 /**
  * `xs:complexType` which has a `xs:sequence` child.
  */
-transform,
-    node(NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-    node(NS2,sequence,Sequence_ID,_Sequence_Children,ComplexType_ID),
-    json(Sequence_ID,Sequence_JSON)
+transform(IName), 
+    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
+    node(IName,NS2,sequence,Sequence_ID,_Sequence_Children,ComplexType_ID),
+    json(IName,Sequence_ID,Sequence_JSON)
   ==>
     xsd_namespaces([NS1,NS2])
   |
-    json(ComplexType_ID,Sequence_JSON).
+    json(IName,ComplexType_ID,Sequence_JSON).
 
 
 /**
@@ -1290,14 +1359,14 @@ transform,
  *   - form
  *   - id
  */
-transform,
-    node(NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-    node(NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID),
-    node_attribute(Attribute_ID,name,Attribute_Name,_),
-    node_attribute(Attribute_ID,type,Type_With_NS,_),
-    node_attribute(Attribute_ID,use,Use,_),
-    node_attribute(Attribute_ID,fixed,Fixed,_),
-    node_attribute(Attribute_ID,default,Default,_)
+transform(IName), 
+    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID),
+    node_attribute(IName,Attribute_ID,name,Attribute_Name,_),
+    node_attribute(IName,Attribute_ID,type,Type_With_NS,_),
+    node_attribute(IName,Attribute_ID,use,Use,_),
+    node_attribute(IName,Attribute_ID,fixed,Fixed,_),
+    node_attribute(IName,Attribute_ID,default,Default,_)
   ==>
     \+var(Type_With_NS),
     xsd_namespaces([NS1,NS2]),
@@ -1343,7 +1412,7 @@ transform,
         Use \= required,
         JSON2 = JSON1
     ),
-    json(ComplexType_ID,json(JSON2)).
+    json(IName,ComplexType_ID,json(JSON2)).
 
 
 /**
@@ -1354,16 +1423,16 @@ transform,
  * This rule will be called once the JSON for the inner 
  *   `xs:simpleType` has been generated.
  */
-transform,
-    node(NS3,simpleType,SimpleType_ID,_SimpleType_Children,Attribute_ID),
-    json(SimpleType_ID,json(SimpleType_JSON)),
-    node(NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-    node(NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID),
-    node_attribute(Attribute_ID,name,Attribute_Name,_),
-    node_attribute(Attribute_ID,type,Unbound_Type,_),
-    node_attribute(Attribute_ID,use,Use,_),
-    node_attribute(Attribute_ID,fixed,Fixed,_),
-    node_attribute(Attribute_ID,default,Default,_)
+transform(IName), 
+    node(IName,NS3,simpleType,SimpleType_ID,_SimpleType_Children,Attribute_ID),
+    json(IName,SimpleType_ID,json(SimpleType_JSON)),
+    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID),
+    node_attribute(IName,Attribute_ID,name,Attribute_Name,_),
+    node_attribute(IName,Attribute_ID,type,Unbound_Type,_),
+    node_attribute(IName,Attribute_ID,use,Use,_),
+    node_attribute(IName,Attribute_ID,fixed,Fixed,_),
+    node_attribute(IName,Attribute_ID,default,Default,_)
   ==>
     var(Unbound_Type),
     xsd_namespaces([NS1,NS2,NS3])
@@ -1408,7 +1477,7 @@ transform,
         Use \= required,
         JSON2 = JSON1
     ),
-    json(ComplexType_ID,json(JSON2)).
+    json(IName,ComplexType_ID,json(JSON2)).
 
 
 /**
@@ -1418,13 +1487,13 @@ transform,
  * As specified, `@name` and `@type` can not be both 
  *   present.
  */
-transform,
-    node(NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-    node(NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID),
-    node_attribute(Attribute_ID,ref,Ref,_),
-    node_attribute(Attribute_ID,use,Use,_),
-    node_attribute(Attribute_ID,fixed,_Fixed,_),
-    node_attribute(Attribute_ID,default,_Default,_)
+transform(IName), 
+    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID),
+    node_attribute(IName,Attribute_ID,ref,Ref,_),
+    node_attribute(IName,Attribute_ID,use,Use,_),
+    node_attribute(IName,Attribute_ID,fixed,_Fixed,_),
+    node_attribute(IName,Attribute_ID,default,_Default,_)
   ==>
     xsd_namespaces([NS1,NS2])
   |
@@ -1446,7 +1515,7 @@ transform,
         Use \= required,
         JSON2 = JSON1
     ),
-    json(ComplexType_ID,json(JSON2)).
+    json(IName,ComplexType_ID,json(JSON2)).
 
 
 /**
@@ -1456,13 +1525,13 @@ transform,
  *   therefore propagates a new `schema_definition`
  *   constraint with @`Name` as name.
  */
-transform,
-    node(NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
-    node(NS2,attribute,Attribute_ID,_Attribute_Children,Schema_ID),
-    node_attribute(Attribute_ID,name,Attribute_Name,_),
-    node_attribute(Attribute_ID,type,Type_With_NS,_),
-    node_attribute(Attribute_ID,fixed,Fixed,_),
-    node_attribute(Attribute_ID,default,Default,_)
+transform(IName), 
+    node(IName,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,Schema_ID),
+    node_attribute(IName,Attribute_ID,name,Attribute_Name,_),
+    node_attribute(IName,Attribute_ID,type,Type_With_NS,_),
+    node_attribute(IName,Attribute_ID,fixed,Fixed,_),
+    node_attribute(IName,Attribute_ID,default,Default,_)
   ==>
     \+var(Type_With_NS),
     xsd_namespaces([NS1,NS2]),
@@ -1492,7 +1561,7 @@ transform,
         Attribute_JSON3 = [default=Default_Casted|Attribute_JSON2]
     ),
     string_concat('@',Attribute_Name,Definition_Name),
-    schema_definition(Definition_Name,Attribute_ID,json(Attribute_JSON3)).
+    schema_definition(IName,Definition_Name,Attribute_ID,json(Attribute_JSON3)).
 
 
 /**
@@ -1502,27 +1571,113 @@ transform,
 /**
  * `xs:simpleType` which has a `xs:restriction` child.
  */
-transform,
-    node(NS1,simpleType,SimpleType_ID,_SimpleType_Children,_SimpleType_Parent_ID),
-    node(NS2,restriction,Restriction_ID,_Restriction_Children,SimpleType_ID),
-    json(Restriction_ID,Restriction_JSON)
+transform(IName), 
+    node(IName,NS1,simpleType,SimpleType_ID,_SimpleType_Children,_SimpleType_Parent_ID),
+    node(IName,NS2,restriction,Restriction_ID,_Restriction_Children,SimpleType_ID),
+    json(IName,Restriction_ID,Restriction_JSON)
   ==>
     xsd_namespaces([NS1,NS2])
   |
-    json(SimpleType_ID,Restriction_JSON).
+    json(IName,SimpleType_ID,Restriction_JSON).
+
+
+/**
+ * ##########  XS:INCLUDE  ##########
+ */
+
+/**
+ * Call xsd2json for included schemas.
+ */
+node(IName_Parent,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName_Parent,NS2,include,Include_ID,_Include_Children,Schema_ID),
+    node_attribute(IName_Parent,Include_ID,schemaLocation,Schema_Location,_)
+  ==>
+    xsd_namespaces([NS1,NS2])
+  |
+    /**
+     * Add empty json([]) to hold for schemas that only contain
+     * includes.
+     */
+    json(IName_Parent,Schema_ID,json([])),
+    relative_input(IName_Parent,Schema_Location,Location),
+    xsd2json(Location,_).
+
+
+/**
+ * Merge included sub-schema.
+ */
+transform(IName_Parent),
+    node(IName_Parent,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName_Parent,NS2,include,Include_ID,_Include_Children,Schema_ID),
+    node_attribute(IName_Parent,Include_ID,schemaLocation,Schema_Location,_)
+  \
+    json(IName_Parent,Schema_ID,Schema_JSON),
+    xsd2json_result(IName_Include,Include_JSON)
+  <=>
+    xsd_namespaces([NS1,NS2]),
+    relative_input(IName_Parent,Schema_Location,Location),
+    input_name(Location,IName_Include)
+  |
+    merge_json(Schema_JSON,Include_JSON,JSON),
+    json(IName_Parent,Schema_ID,JSON).
+
+
+/**
+ * ##########  XS:IMPORT  ##########
+ */
+
+/**
+ * Call xsd2json for imported schemas.
+ */
+node(IName_Parent,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName_Parent,NS2,import,Import_ID,_Import_Children,Schema_ID),
+    node_attribute(IName_Parent,Import_ID,schemaLocation,Schema_Location,_)
+  ==>
+    xsd_namespaces([NS1,NS2])
+  |
+    /**
+     * Add empty json([]) to hold for schemas that only contain
+     * imports.
+     */
+    json(IName_Parent,Schema_ID,json([])),
+    relative_input(IName_Parent,Schema_Location,Location),
+    xsd2json(Location,_).
+
+
+/**
+ * Merge imported sub-schema.
+ */
+transform(IName_Parent),
+    node(IName_Parent,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName_Parent,NS2,import,Import_ID,_Import_Children,Schema_ID),
+    node_attribute(IName_Parent,Import_ID,schemaLocation,Schema_Location,_),
+    node_attribute(IName_Parent,Import_ID,namespace,Namespace_URI,_)
+  \
+    json(IName_Parent,Schema_ID,Schema_JSON),
+    xsd2json_result(IName_Import,Import_JSON)
+  <=>
+    xsd_namespaces([NS1,NS2]),
+    relative_input(IName_Parent,Schema_Location,Location),
+    input_name(Location,IName_Import),
+    namespace_uri(Import_NS,Namespace_URI)
+  |
+    add_namespace(Import_JSON,Import_NS,Import_JSON_With_NS),
+    merge_json(Schema_JSON,Import_JSON_With_NS,JSON),
+    json(IName_Parent,Schema_ID,JSON).
+
 
 
 /**
  * ##########  XS:SCHEMA  ##########
  */
-transform,
-    node(NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
-    node(NS2,element,Element_ID,_Element_Children,Schema_ID),
-    json(Element_ID,Element_JSON)
+transform(IName), 
+    node(IName,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName,NS2,element,Element_ID,_Element_Children,Schema_ID),
+    json(IName,Element_ID,Element_JSON)
   ==>
     xsd_namespaces([NS1,NS2])
   |
-    json(Schema_ID,Element_JSON).
+    json(IName,Schema_ID,Element_JSON).
 
 
 /**
@@ -1530,14 +1685,14 @@ transform,
  *   `complexType` node which has the `@name` attribute
  *   set.
  */
-transform,
-    node(NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-    json(ComplexType_ID,ComplexType_JSON),
-    node_attribute(ComplexType_ID,name,Definition_Name,_)
+transform(IName), 
+    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
+    json(IName,ComplexType_ID,ComplexType_JSON),
+    node_attribute(IName,ComplexType_ID,name,Definition_Name,_)
   ==>
     xsd_namespaces([NS1])
   |
-    schema_definition(Definition_Name,ComplexType_ID,ComplexType_JSON).
+    schema_definition(IName,Definition_Name,ComplexType_ID,ComplexType_JSON).
 
 
 /**
@@ -1545,28 +1700,28 @@ transform,
  *   `simpleType` node which has the `@name` attribute
  *   set.
  */
-transform,
-    node(NS1,simpleType,SimpleType_ID,_SimpleType_Children,_SimpleType_Parent_ID),
-    json(SimpleType_ID,SimpleType_JSON),
-    node_attribute(SimpleType_ID,name,Definition_Name,_)
+transform(IName), 
+    node(IName,NS1,simpleType,SimpleType_ID,_SimpleType_Children,_SimpleType_Parent_ID),
+    json(IName,SimpleType_ID,SimpleType_JSON),
+    node_attribute(IName,SimpleType_ID,name,Definition_Name,_)
   ==>
     xsd_namespaces([NS1])
   |
-    schema_definition(Definition_Name,SimpleType_ID,SimpleType_JSON).
+    schema_definition(IName,Definition_Name,SimpleType_ID,SimpleType_JSON).
 
 
 /**
  * ##########  ON BUILD_SCHEMA  ##########
  */
 
-build_schema, 
-    schema_definition(Name,_ID,Inline_Schema),
-    node(Namespace,schema,Schema_ID,_Schema_Children,_)
+build_schema(IName), 
+    schema_definition(IName,Name,_ID,Inline_Schema),
+    node(IName,Namespace,schema,Schema_ID,_Schema_Children,_)
   ==>
     xsd_namespace(Namespace),
     first_id(Schema_ID)
   |
-    json(Schema_ID,json([definitions=json([Name=Inline_Schema])])).
+    json(IName,Schema_ID,json([definitions=json([Name=Inline_Schema])])).
 
 
 /**
@@ -1574,17 +1729,17 @@ build_schema,
  */
 
 /**
- * get_json/2
- * get_json(ID,Unbound_Var)
+ * get_json/3
+ * get_json(IName,ID,Unbound_Var)
  *
- * Bind a variable to the content of the json/2 Constraint 
+ * Bind a variable to the content of the json Constraint 
  * with the same ID.
  * Usually used when finished to get the root's JSON.
  */
-:- chr_constraint get_json/2.
+:- chr_constraint get_json/3.
 
-json(ID,JSON)
+json(IName,ID,JSON)
   \
-    get_json(ID,Result) 
+    get_json(IName,ID,Result) 
   <=> 
     JSON = Result.

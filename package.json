@@ -1,6 +1,6 @@
 {
   "name": "xsd2json",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Translate an XML Schema into equivalent JSON Schema",
   "main": "index.js",
   "bin": "./bin/xsd2json",
@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "char-spinner": "^1.0.1",
+    "commander": "^2.5.0",
     "concat-stream": "^1.4.6",
     "duplex-child-process": "0.0.5"
   },

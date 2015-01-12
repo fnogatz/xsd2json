@@ -1,0 +1,27 @@
+{
+  "definitions": {
+    "OrderType": {
+      "type": "object",
+      "properties": {
+        "customer": {
+          "type": "string"
+        },
+        "number": {
+          "type": "integer",
+          "minimum": 0,
+          "exclusiveMinimum": true
+        },
+        "items": {
+          "type": "integer",
+          "minimum": 0,
+          "exclusiveMinimum": false
+        }
+      },
+      "required": [
+        "number",
+        "customer",
+        "items"
+      ]
+    }
+  }
+}

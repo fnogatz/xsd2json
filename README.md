@@ -23,7 +23,7 @@ Or simply clone this repository:
 
 If you install xsd2json via npm it will create a new command `xsd2json`:
 
-	$ xsd2json < /path/to/your.xsd > /created/schema.json
+	$ xsd2json /path/to/your.xsd > /created/schema.json
 
 
 ## Usage with node.js
@@ -31,25 +31,21 @@ If you install xsd2json via npm it will create a new command `xsd2json`:
 The xsd2json module can be used programmatically as function or stream:
 
 	var xsd2json = require('xsd2json');
+	var filename = 'test.xsd';
 
 	// use as stream: Read from stdin
-	process.stdin
-	  .pipe(xsd2json())
+	xsd2json(filename)
 	  .pipe(process.stdout);
 
 	// use as function
-	xsd2json(xsdString, function(err, schemaObject) {
+	xsd2json(filename, function(err, schemaObject) {
 	  console.log(JSON.stringify(schemaObject, null, 2));
 	});
 
 
 ## Usage with Prolog
 
-xsd2json provides a command line interface using SWI-Prolog. You can use it via
-
-	$ swipl -q -f lib-pl/cli.pl -- < /path/to/your.xsd
-
-For further instructions on how to use xsd2json programmatically in Prolog, have a look at the Prolog module's [Readme](https://github.com/fnogatz/xsd2json/tree/master/lib-pl).
+xsd2json provides a predicate `xsd2json(+XSD,-JSON)`, which holds for a given XML Schema (either file path, URL or `stream`). For instructions on how to use xsd2json programmatically in Prolog, have a look at the Prolog module's [Readme](https://github.com/fnogatz/xsd2json/tree/master/lib-pl).
 
 
 ## Background
