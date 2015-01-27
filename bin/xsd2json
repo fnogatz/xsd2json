@@ -23,10 +23,10 @@ log.cli();
 xsd2json.xsd2json(filePath, function(err, result) {
 	if (err) throw err;
 	if (program.output) {
-		fs.writeFile(program.output, result);
+		fs.writeFile(program.output, JSON.stringify(result, null, 2));
 	} else {
 		log.debug('JSON schema result:\n');
-		console.log(result);
+		console.log(JSON.stringify(result, null, 2));
 		log.debug('\nUse -o --output option to save result to a file');
 	}
 });
