@@ -1681,6 +1681,20 @@ transform(IName),
 
 
 /**
+ * Nested `xs:schema/xs:element/xs:simpleType` structure.
+ */
+transform(IName), 
+    node(IName,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName,NS2,element,Element_ID,_Element_Children,Schema_ID),
+    node(IName,NS3,simpleType,SimpleType_ID,_SimpleType_Children,Element_ID),
+    json(IName,SimpleType_ID,SimpleType_JSON)
+  ==>
+    xsd_namespaces([NS1,NS2,NS3])
+  |
+    json(IName,Schema_ID,SimpleType_JSON).
+
+
+/**
  * Create `schema_definition/3` constraint for each 
  *   `complexType` node which has the `@name` attribute
  *   set.
