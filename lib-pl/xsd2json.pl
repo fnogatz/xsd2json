@@ -1148,34 +1148,17 @@ transform(IName),
  */
 
 /**
- * Convert a `xs:annotation/xs:documentation` within a
- *   `xs:element` node.
+ * Convert a `xs:annotation/xs:documentation`.
  */
 transform(IName), 
-    node(IName,NS1,element,Element_ID,_Element_Children,_Element_Parent_ID),
-    node(IName,NS2,annotation,Annotation_ID,_Annotation_Children,Element_ID),
+    node(IName,NS1,_Some,Some_ID,_Some_Children,_Some_Parent_ID),
+    node(IName,NS2,annotation,Annotation_ID,_Annotation_Children,Some_ID),
     node(IName,NS3,documentation,Documentation_ID,_Documentation_Children,Annotation_ID),
     text_node(IName,_Text_Node_ID,Text,Documentation_ID)
   ==> 
     xsd_namespaces([NS1,NS2,NS3])
   |
-    json(IName,Element_ID,json([description=Text])).
-
-
-/**
- * Convert a `xs:annotation/xs:documentation` within a
- *   `xs:simpleType` node which has a `@name` attribute set.
- */
-transform(IName), 
-    node(IName,NS1,simpleType,SimpleType_ID,_SimpleType_Children,_SimpleType_Parent_ID),
-    node_attribute(IName,SimpleType_ID,name,_Name,_),
-    node(IName,NS2,annotation,Annotation_ID,_Annotation_Children,SimpleType_ID),
-    node(IName,NS3,documentation,Documentation_ID,_Documentation_Children,Annotation_ID),
-    text_node(IName,_Text_Node_ID,Text,Documentation_ID)
-  ==> 
-    xsd_namespaces([NS1,NS2,NS3])
-  |
-    json(IName,SimpleType_ID,json([description=Text])).
+    json(IName,Some_ID,json([description=Text])).
 
 
 /**
