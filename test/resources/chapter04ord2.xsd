@@ -8,6 +8,8 @@
     <xs:sequence>
       <xs:element name="id" type="xs:anyURI"/>
       <xs:element name="aGroupElement" type="xs:token"/>
+      <xs:element name="anySimpleTypeElement" type="xs:anySimpleType"/>
+      <xs:element name="anyTypeElement" type="xs:anyType"/>
     </xs:sequence>
   </xs:group>
 

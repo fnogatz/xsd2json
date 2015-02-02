@@ -15,6 +15,8 @@
         "number",
         "date",
         "id",
+        "anySimpleTypeElement",
+        "anyTypeElement",
         "aGroupElement"
       ],
       "type": "object",
@@ -40,6 +42,23 @@
           "type": "string",
           "format": "uri"
         },
+        "anySimpleTypeElement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "anyTypeElement": {},
         "aGroupElement": {
           "type": "string"
         }
@@ -49,6 +68,8 @@
       "required": [
         "number",
         "id",
+        "anySimpleTypeElement",
+        "anyTypeElement",
         "anotherChoice",
         "aGroupElement"
       ],
@@ -71,11 +92,43 @@
           "type": "string",
           "format": "uri"
         },
+        "anySimpleTypeElement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "anyTypeElement": {},
         "anotherChoice": {
           "type": "boolean"
         },
         "aGroupElement": {
           "type": "string"
+        }
+      }
+    },
+    "exampleorgord:CustomerType": {
+      "required": [
+        "name",
+        "number"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/exampleorgord:CustNameType"
+        },
+        "number": {
+          "type": "integer"
         }
       }
     },
@@ -111,21 +164,6 @@
         },
         "color": {
           "$ref": "#/definitions/exampleorgprod:ColorType"
-        },
-        "number": {
-          "type": "integer"
-        }
-      }
-    },
-    "exampleorgord:CustomerType": {
-      "required": [
-        "name",
-        "number"
-      ],
-      "type": "object",
-      "properties": {
-        "name": {
-          "$ref": "#/definitions/exampleorgord:CustNameType"
         },
         "number": {
           "type": "integer"

@@ -1,6 +1,7 @@
 var xml2js = require('xml2js');
 var JaySchema = require('jayschema');
-var should = require('should');
+require('should');
+var _ = require('lodash');
 
 var js = new JaySchema();
 
@@ -49,10 +50,22 @@ describe('xsd2json', function() {
 
 		var errors = js.validate(exampleInstance, jsonSchema);
 		if (errors.length > 0) {
-			console.log('Validation errors');
-			console.log(JSON.stringify(errors, null, 2));
+			//console.log('Validation errors');
+			//console.log(JSON.stringify(errors, null, 2));
 		}
 		errors.should.have.length(0);
+	});
+
+	it('should reject the example document with complex object in anySimpleType element', function() {
+		// do not authorize additional properties in this test. It prevents some ambiguities.
+		jsonSchema.definitions['exampleorgord:CompletedOrderTypeCHOICE0'].additionalProperties = false;
+		jsonSchema.definitions['exampleorgord:CompletedOrderTypeCHOICE1'].additionalProperties = false;
+
+		var example = _.cloneDeep(exampleInstance);
+		example.anySimpleTypeElement = {};
+
+		var errors = js.validate(example, jsonSchema);
+		errors.should.have.length(1);
 	});
 
 	it('should validate the alternative of the root choice', function() {

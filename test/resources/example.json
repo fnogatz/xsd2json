@@ -23,5 +23,7 @@
 		"number": 2
 	},
 	"aGroupElement": "test",
-	"id": "myId"
+	"id": "myId",
+	"anySimpleTypeElement": "test",
+	"anyTypeElement": {}
 }
