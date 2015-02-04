@@ -713,6 +713,7 @@ convert_xsd_type(float,json([type=number])).
 convert_xsd_type(double,json([type=number])).
 convert_xsd_type(decimal,json([type=number])).
 convert_xsd_type(integer,json([type=integer])).
+convert_xsd_type(gYear,json([type=integer])).
 
 convert_xsd_type(positiveInteger,json([type=integer,minimum=0,exclusiveMinimum= @(true)])).
 convert_xsd_type(negativeInteger,json([type=integer,maximum=0,exclusiveMaximum= @(true)])).
@@ -1675,6 +1676,20 @@ transform(IName),
     xsd_namespaces([NS1,NS2,NS3])
   |
     json(IName,Schema_ID,SimpleType_JSON).
+
+
+/**
+ * Nested `xs:schema/xs:element/xs:complexType` structure.
+ */
+transform(IName), 
+    node(IName,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName,NS2,element,Element_ID,_Element_Children,Schema_ID),
+    node(IName,NS3,complexType,ComplexType_ID,_ComplexType_Children,Element_ID),
+    json(IName,ComplexType_ID,ComplexType_JSON)
+  ==>
+    xsd_namespaces([NS1,NS2,NS3])
+  |
+    json(IName,Schema_ID,ComplexType_JSON).
 
 
 /**
