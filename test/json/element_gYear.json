@@ -1,0 +1,10 @@
+{
+  "definitions": {
+    "xs:gYear": {
+      "type": "integer"
+    }
+  },
+  "type": {
+    "$ref": "#/definitions/xs:gYear"
+  }
+}
