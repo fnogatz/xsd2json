@@ -713,6 +713,7 @@ convert_xsd_type(float,json([type=number])).
 convert_xsd_type(double,json([type=number])).
 convert_xsd_type(decimal,json([type=number])).
 convert_xsd_type(integer,json([type=integer])).
+convert_xsd_type(gYear,json([type=integer])).
 
 convert_xsd_type(positiveInteger,json([type=integer,minimum=0,exclusiveMinimum= @(true)])).
 convert_xsd_type(negativeInteger,json([type=integer,maximum=0,exclusiveMaximum= @(true)])).
