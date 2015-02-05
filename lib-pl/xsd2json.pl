@@ -1140,7 +1140,8 @@ transform(IName),
     xsd_namespace(Namespace),
     \+valid_xsd_type(Type_With_NS,_Type)
   |
-    json(IName,ID,json([type=Type_With_NS])).
+    reference_type(Type_With_NS,JSON),
+    json(IName,ID,JSON).
 
 
 /**

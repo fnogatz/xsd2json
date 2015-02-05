@@ -5,6 +5,7 @@
   "main": "index.js",
   "bin": "./bin/xsd2json",
   "scripts": {
+    "test-json-schemas": "node test/json-schemas.js",
     "test": "npm run-script test-converter",
     "test-converter": "node test/index.js interpreted",
     "test-examples": "node test/index.js validate-json"
@@ -35,6 +36,6 @@
     "interpreted": "^0.5.0",
     "nomnom": "^1.8.0",
     "tap": "^0.4.13",
-    "tv4": "^1.1.4"
+    "jayschema": "^0.3.1"
   }
 }
