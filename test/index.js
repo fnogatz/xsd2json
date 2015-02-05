@@ -6,7 +6,8 @@ var xsd2json = require('../index');
 
 var interpreted = require('interpreted');
 var tap = require('tap');
-var tv4 = require('tv4');
+var JaySchema = require('jayschema');
+var JSON_META_SCHEMA = require('jayschema/lib/suites/draft-04/json-schema-draft-v4.json');
 var parser = require('nomnom');
 var async = require('async');
 
@@ -119,21 +120,18 @@ function validateJSONfiles(options) {
   fs.readdir(path.resolve(__dirname, 'json'), function(err, files) {
     if (err) throw err;
 
-    var schema = require(path.resolve(__dirname, 'meta-schema-04.json'));
-
     tap.test(files.length+' files', function(t) {
+      var js = new JaySchema();
+
       async.eachSeries(files, function validateFile(filename, callback) {
         t.test(filename, function(t) {
           var data = require(path.resolve(__dirname, 'json', filename));
-          var valid = tv4.validate(data, schema);
-
-          if (!valid)
-            throw new Error(util.inspect(tv4.error));
+          var valid = js.validate(data, JSON_META_SCHEMA).length === 0;
           
           t.ok(valid, 'is valid JSON Schema');
           t.end();
 
-          callback(valid ? null : tv4.error)
+          callback(null)
         });
       }, function onEnd(err) {
         t.end();
