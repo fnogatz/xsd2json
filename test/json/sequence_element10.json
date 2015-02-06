@@ -15,7 +15,7 @@
           "type": "string"
         }
       },
-      "required": ["cat","dog"]
+      "required": ["cat", "dog"]
     }
   }
 }

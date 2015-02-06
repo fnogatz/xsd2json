@@ -1,6 +1,8 @@
 {
   "definitions": {
     "dog": {
+      "minLength": 5,
+      "maxLength": 10,
       "type": "string"
     }
   }

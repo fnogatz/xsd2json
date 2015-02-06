@@ -2,7 +2,12 @@
   "definitions": {
     "pets": {
       "type": "string",
-      "enum": ["cat","dog","parrot","hamster"]
+      "enum": [
+        "cat",
+        "dog",
+        "parrot",
+        "hamster"
+      ]
     }
   }
 }

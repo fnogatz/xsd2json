@@ -1,4 +1,5 @@
-:- module(merge_json, [ merge_json/3, merge_json/4, lookup/4 ]).
+:- module(merge_json, [ merge_json/3, merge_json/4, merge_facets/3, merge_facet/4, lookup/4 ]).
+:- use_module(helpers).
 
 
 /**
@@ -52,8 +53,12 @@ merge_json(json([Key=Value|Rest_JSON_List1]),json(JSON_List2),json(Merged),On_Co
       (Key == required; Key == enum), 
       union(Value,Value_in_JSON_List2,Merged_Value)
     ;
+      Key == facets,
+      merge_facets(Value,Value_in_JSON_List2,Merged_Value)
+    ;
       Key \== required, 
       Key \== enum,
+      Key \== facets,
       merge_json(Value,Value_in_JSON_List2,Merged_Value)
   ),
   % merge the rest of the lists independently of the
@@ -94,6 +99,37 @@ merge_json(List1,List2,Merged_List,_On_Conflict) :-
 % merge_json(JSON1,JSON2,_) :- write(JSON1), nl, write(JSON2), nl,nl,nl, false.
 merge_json(JSON1,JSON2,JSON) :-
   merge_json(JSON1,JSON2,JSON,hard).
+
+
+/**
+ * merge_facets/3.
+ */
+merge_facets(json([]),json(JSON_List2),json(JSON_List2)).
+merge_facets(json(JSON_List1),json([]),json(JSON_List1)) :- JSON_List1 \= [].
+merge_facets(json([Key=Value|Rest_JSON_List1]),json(JSON_List2),json(JSON)) :-
+  lookup(Key,JSON_List2,Value_in_JSON_List2,JSON2_Without_Key),
+  merge_facet(Key,Value,Value_in_JSON_List2,Merged_Value),
+  merge_facets(json(Rest_JSON_List1),json(JSON2_Without_Key),json(Rest_Merged)),
+  JSON = [Key=Merged_Value|Rest_Merged].
+merge_facets(json([Key=Value|Rest_JSON_List1]),json(JSON_List2),json(JSON)) :-
+  \+lookup(Key,JSON_List2,_Value_in_JSON_List2),
+  merge_facets(json(Rest_JSON_List1),json(JSON_List2),json(Rest_Merged)),
+  JSON = [Key=Value|Rest_Merged].
+
+
+/**
+ * merge_facet/4
+ * merge_facet(Facet,Value1,Value2,Result_Value)
+ */
+merge_facet(minLength,A,B,A) :- A >= B.
+merge_facet(minLength,A,B,B) :- A < B.
+merge_facet(maxLength,A,B,A) :- A =< B.
+merge_facet(maxLength,A,B,B) :- A > B.
+merge_facet(minimum,A,B,A) :- A >= B.
+merge_facet(minimum,A,B,B) :- A < B.
+merge_facet(maximum,A,B,A) :- A =< B.
+merge_facet(maximum,A,B,B) :- A > B.
+merge_facet(pattern,A,B,R) :- string_concat(['(',A,'|',B,')'],R).
 
 
 /**
