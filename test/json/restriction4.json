@@ -1,0 +1,18 @@
+{
+  "definitions": {
+    "dog": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/myString"
+        },
+        {
+          "minLength": 5,
+          "maxLength": 10
+        }
+      ]
+    },
+    "myString": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "definitions": {
+    "dog": {
+      "$ref": "#/definitions/myString"
+    },
+    "myString": {
+      "type": "string"
+    }
+  }
+}

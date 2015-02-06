@@ -1,5 +1,6 @@
 :- module(xsd2json, [ xsd2json/2, flatten_xsd/1 ]).
 :- use_module(merge_json).
+:- use_module(helpers).
 :- use_module(library(chr)).
 :- use_module(library(http/http_open)).
 :- use_module(library(url)).
@@ -246,7 +247,7 @@ xsd2json(Input,Result) :-
   Children_IDs = [First_Element|_],
   build_schema(Input_Name),
   get_json(Input_Name,First_Element,JSON),
-  remove_at_from_property_names(JSON,Result),
+  cleanup_json(JSON,Result),
   xsd2json_result(Input_Name,Result).
 
 
@@ -424,23 +425,6 @@ to_number(Number,Number) :-
 
 
 /**
- * string_concat/2
- * string_concat(List_Of_Strings,Concatenated_String)
- *
- * Concatenates all strings of a given `List_Of_Strings` to
- *   `Concatenated_String` by use of the predefined 
- *   `string_concat/3`.
- *
- * Examples:
- *   string_concat(['a','b','c'], "abc").
- *   string_concat([a,b,c],"abc").
- */
-string_concat([],'').
-string_concat([A],A).
-string_concat([A,B|Bs],Result) :- string_concat(A,B,Temp), string_concat([Temp|Bs],Result).
-
-
-/**
  * relative_input/3
  *
  * Examples:
@@ -480,6 +464,69 @@ elength([Single_List],Length) :-
 elength([L|Ls],Length) :-
   length(L,Length),
   elength(Ls,Length).
+
+
+/**
+ * cleanup_json/2
+ */
+cleanup_json(JSON,Result) :-
+  remove_at_from_property_names(JSON,R1),
+  resolve_facets(R1,R2),
+  Result = R2.
+
+
+/**
+ * resolve_facets/2
+ */
+resolve_facets([],[]).
+
+resolve_facets([H|T],[NH|NT]) :-
+  resolve_facets(T,NT),
+  resolve_facets(H,NH).
+
+resolve_facets(json([]),json([])).
+
+resolve_facets(json(List),json(JSON)) :-
+  \+lookup(facets,List,json(_Properties),_List_Without_Properties),
+  List = [Key=json(Value)|Rest],
+  resolve_facets(json(Rest),json(New_Rest)),
+  resolve_facets(json(Value),json(New_Value)),
+  JSON = [Key=json(New_Value)|New_Rest].
+
+resolve_facets(json(List),json(JSON)) :-
+  \+lookup(facets,List,json(_Properties),_List_Without_Properties),
+  List = [Key=Value|Rest],
+  Value \= json(_),
+  resolve_facets(json(Rest),json(New_Rest)),
+  JSON = [Key=Value|New_Rest].
+
+resolve_facets(json(List),json(JSON)) :-
+  lookup(facets,List,json(Facets),List_Without_Facets),
+  lookup(type,List_Without_Facets,Type,List_Wo_Facets_Type),
+  merge_json(json([type= Type | Facets]), json(List_Wo_Facets_Type), json(JSON)).
+
+resolve_facets(json(List),json(JSON)) :-
+  lookup(facets,List,json(Facets),List_Without_Facets),
+  lookup(base,List_Without_Facets,json(Base),List_Wo_Facets_Base),
+  lookup(allOf,List_Wo_Facets_Base,AllOf,List_Wo_Facets_Base_AllOf),
+  resolve_facets(AllOf,Resolved_AllOf),
+  append(Resolved_AllOf,[json(Base),json(Facets)],New_AllOf),
+  JSON = [
+    allOf= New_AllOf
+    | List_Wo_Facets_Base_AllOf
+  ].
+
+resolve_facets(json(List),json(JSON)) :-
+  lookup(facets,List,json(Facets),List_Without_Facets),
+  lookup(base,List_Without_Facets,json(Base),List_Wo_Facets_Base),
+  \+lookup(allOf,List_Wo_Facets_Base,_AllOf,_),
+  JSON = [
+    allOf= [
+      json(Base),
+      json(Facets)
+    ]
+    | List_Wo_Facets_Base
+  ].
 
 
 /**
@@ -561,10 +608,6 @@ remove_at_from_property_names(json(List),JSON) :-
   remove_at_from_property_names(json(Rest),json(New_Rest)),
   remove_at_from_property_names(json(Value),json(New_Value)),
   JSON = json([Key=json(New_Value)|New_Rest]).
-
-remove_at_from_property_names(JSON,H) :-
-  var(H),
-  write('  (1) Not found at remove_at_from_property_names/2: '), write(JSON), nl, nl.
 
 
 /**
@@ -934,19 +977,6 @@ node(IName,NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Par
 
 
 /**
- * 
- */
-%% node(NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-%%     json(ComplexType_ID,json(JSON))
-%%   \
-%%     node(NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID)
-%%   <=>
-%%     xsd_namespaces([NS1,NS2,NS3])
-%%     merge_json:lookup(properties,)
-
-
-
-/**
  * ## Set defaults ##
  *
  * Note: This will already be executed without the 
@@ -1042,16 +1072,67 @@ node(IName,Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
  * Every restriction has at least its base type in an `base=Base`
  *   attribute.
  */
-transform(IName), 
-    node(IName,Namespace,restriction,ID,_Children,_Parent_ID),
+transform(IName),
+    node(IName,Namespace,restriction,ID,Restriction_Children,_Parent_ID),
     node_attribute(IName,ID,base,Base,_)
   ==>
     xsd_namespace(Namespace),
     namespace(Base,Base_Namespace,Base_Type),
     xsd_namespace(Base_Namespace),
-    convert_xsd_type(Base_Type,JSON)
+    convert_xsd_type(Base_Type,json(Base_Type_JSON))
   |
-    json(IName,ID,JSON).
+    (
+      % type is JSON primitive like 'integer', 'string'
+      Base_Type_JSON = [type= Primitive_JSON_Type],
+      JSON = [
+        type= Primitive_JSON_Type
+      ]
+    ;
+      % type is not primitive but restriction has no further facets
+      Base_Type_JSON \= [type= Primitive_JSON_Type],
+      Restriction_Children = [],
+      JSON = Base_Type_JSON
+    ;
+      % type is not primitive and with further facets, so result
+      %   should be `allOf=[ ... ]`
+      Base_Type_JSON \= [type=_Primitive_JSON_Type],
+      string_concat([xs,':',Base_Type], XS_Prefixed_Base_Type),
+      schema_definition(IName,XS_Prefixed_Base_Type,ID,json(Base_Type_JSON)),
+      string_concat('#/definitions/',XS_Prefixed_Base_Type,XS_Prefixed_Base_Type_Reference),
+      JSON = [
+        facets= json([]),
+        base= json([ '$ref'= XS_Prefixed_Base_Type_Reference ])
+      ]
+    ),
+    json(IName,ID,json(JSON)).
+
+
+/**
+ * Restriction base is a self defined data type.
+ */
+transform(IName),
+    node(IName,Namespace,restriction,ID,Restriction_Children,_Parent_ID),
+    node_attribute(IName,ID,base,Base,_)
+  ==>
+    xsd_namespace(Namespace),
+    \+namespace(Base,_Base_Namespace,_Base_Type)
+  |
+    string_concat('#/definitions/',Base,Base_Reference),
+    (
+      % no constraining facets, so it's only an alias
+      Restriction_Children = [],
+      JSON = [
+        '$ref'= Base_Reference
+      ]
+    ;
+      % Add `allOf=[ ... ]` because of constraining facets
+      Restriction_Children \= [],
+      JSON = [
+        facets= json([]),
+        base= json([ '$ref'= Base_Reference ])
+      ]
+    ),
+    json(IName,ID,json(JSON)).
 
 
 /**
@@ -1089,13 +1170,16 @@ transform(IName),
  */
 transform(IName), 
     node(IName,NS1,restriction,Restriction_ID,_Restriction_Children,_Restriction_Parent_ID),
-    node(IName,NS2,Constraint_Name_XSD,Constraint_ID,_Constraint_Children,Restriction_ID),
-    node_attribute(IName,Constraint_ID,value,Value,_)
+    node(IName,NS2,Facet_Name_XSD,Facet_ID,_Facet_Children,Restriction_ID),
+    node_attribute(IName,Facet_ID,value,Value,_)
   ==>
     xsd_namespaces([NS1,NS2]),
-    convert_xsd_restriction(Constraint_Name_XSD,Value,json(JSON_List))
+    convert_xsd_restriction(Facet_Name_XSD,Value,Facet_JSON)
   |
-    json(IName,Restriction_ID,json(JSON_List)).
+    JSON = [
+      facets=Facet_JSON
+    ],
+    json(IName,Restriction_ID,json(JSON)).
 
 
 /**

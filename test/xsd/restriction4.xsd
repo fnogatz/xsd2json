@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<xs:schema>
+  <xs:simpleType name="dog">
+    <xs:restriction base="myString">
+      <xs:minLength value="5" />
+      <xs:maxLength value="10" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="myString">
+    <xs:restriction base="xs:string">
+
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
