@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<xs:schema>
+  <xs:element name="dog" type="xs:base64Binary" />
+</xs:schema>

@@ -750,18 +750,36 @@ xsd_type(Type) :- convert_xsd_type(Type,_).
  * Translate a `XSD_Type` to its equivalent JSON Schema
  *   representation, specified as `json(JSON_List)`.
  */
-convert_xsd_type(string,json([type=string])).
-convert_xsd_type(boolean,json([type=boolean])).
-convert_xsd_type(float,json([type=number])).
-convert_xsd_type(double,json([type=number])).
-convert_xsd_type(decimal,json([type=number])).
-convert_xsd_type(integer,json([type=integer])).
-convert_xsd_type(gYear,json([type=integer])).
+convert_xsd_type(string,json([type= string])).
+convert_xsd_type(normalizedString,json([type= string])).
+convert_xsd_type(base64Binary,json([type= string])).
+convert_xsd_type(boolean,json([type= boolean])).
+convert_xsd_type(float,json([type= number])).
+convert_xsd_type(double,json([type= number])).
+convert_xsd_type(decimal,json([type= number])).
+convert_xsd_type(integer,json([type= integer])).
+convert_xsd_type(short,json([type= integer])).
+convert_xsd_type(gYear,json([type= integer])).
 
-convert_xsd_type(positiveInteger,json([type=integer,minimum=0,exclusiveMinimum= @(true)])).
-convert_xsd_type(negativeInteger,json([type=integer,maximum=0,exclusiveMaximum= @(true)])).
-convert_xsd_type(nonPositiveInteger,json([type=integer,maximum=0,exclusiveMaximum= @false])).
-convert_xsd_type(nonNegativeInteger,json([type=integer,minimum=0,exclusiveMinimum= @false])).
+convert_xsd_type(positiveInteger,json([type= integer,minimum= 0,exclusiveMinimum= @(true)])).
+convert_xsd_type(negativeInteger,json([type= integer,maximum= 0,exclusiveMaximum= @(true)])).
+convert_xsd_type(nonPositiveInteger,json([type= integer,maximum= 0,exclusiveMaximum= @false])).
+convert_xsd_type(nonNegativeInteger,json([type= integer,minimum= 0,exclusiveMinimum= @false])).
+
+convert_xsd_type(anyURI,json([type= string,format= uri])).
+convert_xsd_type(hexBinary,json([type= string,pattern= '^[0-9a-fA-F]*$'])).
+
+convert_xsd_type(anyType,json([])).
+convert_xsd_type(anySimpleType,json(JSON)) :-
+  JSON = [
+    oneOf= [
+      json([type= integer]),
+      json([type= string]),
+      json([type= number]),
+      json([type= boolean]),
+      json([type= null])
+    ]
+  ].
 
 
 /**
