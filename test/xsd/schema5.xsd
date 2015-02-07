@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema>
+  <xs:element name="one">
+    <xs:complexType>
+      <xs:annotation>
+        <xs:documentation>
+          Some annotation.
+        </xs:documentation>
+      </xs:annotation>
+
+      <xs:all>
+        <xs:element name="two" type="xs:string" minOccurs="0" maxOccurs="1" />
+        <xs:element name="three" type="xs:string" minOccurs="0" maxOccurs="1" />
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

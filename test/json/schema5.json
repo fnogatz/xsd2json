@@ -1,0 +1,12 @@
+{
+  "description": "Some annotation.",
+  "type": "object",
+  "properties": {
+    "two": {
+      "type": "string"
+    },
+    "three": {
+      "type": "string"
+    }
+  }
+}
