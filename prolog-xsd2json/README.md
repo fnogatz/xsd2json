@@ -1,6 +1,6 @@
 # xsd2json
 
-CHR module to translate an XML Schema into equivalent JSON Schema.
+Prolog/CHR module to translate an XML Schema into equivalent JSON Schema.
 
 ## Installation
 
@@ -8,9 +8,13 @@ All you need is [SWI-Prolog](http://www.swi-prolog.org/). See there for installa
 
 ## Usage
 
-`xsd2json` provides a command line interface. You can use it via
+`xsd2json` provides a command line interface. You can directly execute it via
 
-	swipl -q -f cli.pl -- < /path/to/your.xsd
+	./cli /path/to/your.xsd
+
+or by calling swipl:
+
+	swipl -q -f cli /path/to/your.xsd
 
 Unfortunately the command line version is way slower than using `xsd2json` programmatically. The `xsd2json.pl` module provides a predicate `xsd2json/2` which can be used to convert a given XSD file into the equivalent JSON Schema. Call it via `swipl -s xsd2json.pl` followed by
 
