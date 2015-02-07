@@ -678,8 +678,8 @@ convert_xsd_type(integer,json([type=integer])).
 
 convert_xsd_type(positiveInteger,json([type=integer,minimum=0,exclusiveMinimum= @(true)])).
 convert_xsd_type(negativeInteger,json([type=integer,maximum=0,exclusiveMaximum= @(true)])).
-convert_xsd_type(nonPositiveInteger,json([type=integer,maximum=0,exclusiveMaximum= @(false)])).
-convert_xsd_type(nonNegativeInteger,json([type=integer,minimum=0,exclusiveMinimum= @(false)])).
+convert_xsd_type(nonPositiveInteger,json([type=integer,maximum=0,exclusiveMaximum= @false])).
+convert_xsd_type(nonNegativeInteger,json([type=integer,minimum=0,exclusiveMinimum= @false])).
 
 
 /**
@@ -704,12 +704,12 @@ convert_xsd_restriction(maxExclusive,Value,json(JSON_List)) :-
 % minInclusive
 convert_xsd_restriction(minInclusive,Value,json(JSON_List)) :-
   to_number(Value,Number),
-  JSON_List = [minimum=Number,exclusiveMinimum= @(false)].
+  JSON_List = [minimum=Number,exclusiveMinimum= @false].
 
 % maxInclusive
 convert_xsd_restriction(maxInclusive,Value,json(JSON_List)) :-
   to_number(Value,Number),
-  JSON_List = [maximum=Number,exclusiveMaximum= @(false)].
+  JSON_List = [maximum=Number,exclusiveMaximum= @false].
 
 % minLength
 convert_xsd_restriction(minLength,Value,json(JSON_List)) :-
