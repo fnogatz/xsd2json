@@ -1,7 +1,9 @@
+var fs = require('fs');
 var xml2js = require('xml2js');
 var JaySchema = require('jayschema');
 require('should');
 var _ = require('lodash');
+var temp = require('temp').track();
 
 var js = new JaySchema();
 
@@ -32,9 +34,19 @@ describe('xsd2json', function() {
 	var jsonSchema;
 	it('should generate a json schema', function(done) {
 		this.timeout(10000);
-		xsd2json.xsd2jsonWrapper(mergedSchemaStr, function(err, schema) {
-			jsonSchema = JSON.parse(schema);
-			done(err);
+
+		temp.open('xsd2json2', function(err, info) {
+			if (err) return done(err);
+
+			fs.write(info.fd, mergedSchemaStr);
+			fs.close(info.fd, function(err) {
+				if (err) return done(err);
+
+				xsd2json.xsd2jsonWrapper(info.path, function(err, schema) {
+					jsonSchema = JSON.parse(schema);
+					done(err);
+				});
+			});
 		});
 	});
 

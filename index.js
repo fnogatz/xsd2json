@@ -5,7 +5,9 @@
  * Other functions are internals exposed for a potential API usage.
  */
 
+var fs = require('fs');
 var xml2js = require('xml2js');
+var temp = require('temp').track();
 
 var xsdInclusions = require('./lib/xsd-inclusions');
 var xsdExtensions = require('./lib/xsd-extensions');
@@ -22,9 +24,18 @@ exports.xsd2json = function(filePath, callback) {
 		var builder = new xml2js.Builder();
 		var xml = builder.buildObject(mergedSchema);
 
-		prologWrapper.xsd2jsonWrapper(xml, function(err, schema) {
+		temp.open('xsd2json2', function(err, info) {
 			if (err) return callback(err);
-			callback(null, jsonProcessing.postProcessing(schema));
+
+			fs.write(info.fd, xml);
+			fs.close(info.fd, function(err) {
+				if (err) return callback(err);
+
+				prologWrapper.xsd2jsonWrapper(info.path, function(err, schema) {
+					if (err) return callback(err);
+					callback(null, jsonProcessing.postProcessing(schema));
+				});
+			});
 		});
 	});
 };
