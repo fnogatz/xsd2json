@@ -750,26 +750,32 @@ xsd_type(Type) :- convert_xsd_type(Type,_).
  * Translate a `XSD_Type` to its equivalent JSON Schema
  *   representation, specified as `json(JSON_List)`.
  */
-convert_xsd_type(string,json([type= string])).
-convert_xsd_type(normalizedString,json([type= string])).
+convert_xsd_type(anyType,json([])).
+convert_xsd_type(anyURI,json([type= string,format= uri])).
 convert_xsd_type(base64Binary,json([type= string])).
 convert_xsd_type(boolean,json([type= boolean])).
-convert_xsd_type(float,json([type= number])).
-convert_xsd_type(double,json([type= number])).
+convert_xsd_type(date,json([type= string,format= 'date-time'])).
+convert_xsd_type(dateTime,json([type= string,format= 'date-time'])).
 convert_xsd_type(decimal,json([type= number])).
-convert_xsd_type(integer,json([type= integer])).
-convert_xsd_type(short,json([type= integer])).
+convert_xsd_type(double,json([type= number])).
+convert_xsd_type(duration,json([type= string,pattern= '^-?P([0-9]+Y)?([0-9]+M)?([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?$'])).
+convert_xsd_type(float,json([type= number])).
+convert_xsd_type(gDay,json([type= integer,minimum= 1,exclusiveMinimum= @false,maximum= 31, exclusiveMaximum= @false])).
+convert_xsd_type(gMonth,json([type= integer,minimum= 1,exclusiveMinimum= @false,maximum= 12, exclusiveMaximum= @false])).
+convert_xsd_type(gMonthDay,json([type= string,pattern= '^--(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'])).
 convert_xsd_type(gYear,json([type= integer])).
-
-convert_xsd_type(positiveInteger,json([type= integer,minimum= 0,exclusiveMinimum= @(true)])).
-convert_xsd_type(negativeInteger,json([type= integer,maximum= 0,exclusiveMaximum= @(true)])).
-convert_xsd_type(nonPositiveInteger,json([type= integer,maximum= 0,exclusiveMaximum= @false])).
-convert_xsd_type(nonNegativeInteger,json([type= integer,minimum= 0,exclusiveMinimum= @false])).
-
-convert_xsd_type(anyURI,json([type= string,format= uri])).
+convert_xsd_type(gYearMonth,json([type= string,pattern= '^[0-9]+-([0][1-9]|1[0-2])$'])).
 convert_xsd_type(hexBinary,json([type= string,pattern= '^[0-9a-fA-F]*$'])).
+convert_xsd_type(integer,json([type= integer])).
+convert_xsd_type(negativeInteger,json([type= integer,maximum= 0,exclusiveMaximum= @(true)])).
+convert_xsd_type(nonNegativeInteger,json([type= integer,minimum= 0,exclusiveMinimum= @false])).
+convert_xsd_type(nonPositiveInteger,json([type= integer,maximum= 0,exclusiveMaximum= @false])).
+convert_xsd_type(normalizedString,json([type= string])).
+convert_xsd_type(positiveInteger,json([type= integer,minimum= 0,exclusiveMinimum= @(true)])).
+convert_xsd_type(short,json([type= integer])).
+convert_xsd_type(string,json([type= string])).
+convert_xsd_type(time,json([type= string,format= 'date-time'])).
 
-convert_xsd_type(anyType,json([])).
 convert_xsd_type(anySimpleType,json(JSON)) :-
   JSON = [
     oneOf= [
@@ -780,6 +786,10 @@ convert_xsd_type(anySimpleType,json(JSON)) :-
       json([type= null])
     ]
   ].
+
+
+
+
 
 
 /**
