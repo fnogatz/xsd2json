@@ -754,6 +754,7 @@ convert_xsd_type(anyType,json([])).
 convert_xsd_type(anyURI,json([type= string,format= uri])).
 convert_xsd_type(base64Binary,json([type= string])).
 convert_xsd_type(boolean,json([type= boolean])).
+convert_xsd_type(byte,json([type= integer,maximum= 127,exclusiveMaximum= @false,minimum= -128,exclusiveMinimum= @false])).
 convert_xsd_type(date,json([type= string,format= 'date-time'])).
 convert_xsd_type(dateTime,json([type= string,format= 'date-time'])).
 convert_xsd_type(decimal,json([type= number])).
@@ -766,7 +767,10 @@ convert_xsd_type(gMonthDay,json([type= string,pattern= '^--(0[1-9]|1[0-2])-(0[1-
 convert_xsd_type(gYear,json([type= integer])).
 convert_xsd_type(gYearMonth,json([type= string,pattern= '^[0-9]+-([0][1-9]|1[0-2])$'])).
 convert_xsd_type(hexBinary,json([type= string,pattern= '^[0-9a-fA-F]*$'])).
+convert_xsd_type(int,json([type= integer])).
 convert_xsd_type(integer,json([type= integer])).
+convert_xsd_type(language,json([type= string])).
+convert_xsd_type(long,json([type= integer])).
 convert_xsd_type(negativeInteger,json([type= integer,maximum= 0,exclusiveMaximum= @(true)])).
 convert_xsd_type(nonNegativeInteger,json([type= integer,minimum= 0,exclusiveMinimum= @false])).
 convert_xsd_type(nonPositiveInteger,json([type= integer,maximum= 0,exclusiveMaximum= @false])).
@@ -775,6 +779,11 @@ convert_xsd_type(positiveInteger,json([type= integer,minimum= 0,exclusiveMinimum
 convert_xsd_type(short,json([type= integer])).
 convert_xsd_type(string,json([type= string])).
 convert_xsd_type(time,json([type= string,format= 'date-time'])).
+convert_xsd_type(token,json([type= string])).
+convert_xsd_type(unsignedByte,json([type= integer,minimum= 0, exclusiveMinimum= @false, maximum= 255,exclusiveMaximum= @false])).
+convert_xsd_type(unsignedLong,json([type= integer,minimum= 0, exclusiveMinimum= @false])).
+convert_xsd_type(unsignedInt,json([type= integer,minimum= 0, exclusiveMinimum= @false])).
+convert_xsd_type(unsignedShort,json([type= integer,minimum= 0, exclusiveMinimum= @false])).
 
 convert_xsd_type(anySimpleType,json(JSON)) :-
   JSON = [
