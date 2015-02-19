@@ -8,12 +8,19 @@ var xsd2json = require('../index');
 program
   .usage('[options] <XSD>')
   .option('-i, --indentation <spaces>')
+  .option('-t, --trace')
   .parse(process.argv);
 
 spinner();
 
 var filename = program.args[0];
-xsd2json(filename, function(err, schema) {
+
+var options = {};
+if (program.trace) {
+  options.trace = true
+};
+
+xsd2json(filename, options, function(err, schema) {
   if (err)
     throw err;
 

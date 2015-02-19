@@ -5,6 +5,9 @@
   "main": "index.js",
   "bin": "./bin/xsd2json",
   "scripts": {
+    "prepublish": "npm run-script create-qlf",
+    "pretest": "npm run-script create-qlf",
+    "create-qlf": "swipl --goal=main -o lib-pl/cli -c lib-pl/cli.pl",
     "test": "npm run-script test-converter",
     "test-converter": "node test/index.js interpreted",
     "test-examples": "node test/index.js validate-json"
@@ -27,8 +30,7 @@
   "dependencies": {
     "char-spinner": "^1.0.1",
     "commander": "^2.5.0",
-    "concat-stream": "^1.4.6",
-    "duplex-child-process": "0.0.5"
+    "concat-stream": "^1.4.6"
   },
   "devDependencies": {
     "async": "^0.9.0",

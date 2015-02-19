@@ -1,6 +1,6 @@
 module.exports = xsd2json;
 
-var childProcess = require('duplex-child-process');
+var childProcess = require('child_process');
 var concat = require('concat-stream');
 var path = require('path');
 
@@ -9,15 +9,48 @@ var PROLOG = process.env.SWIPL || 'swipl';
 var XSD2JSON = process.env.XSD2JSON || path.resolve(__dirname, 'lib-pl', 'cli');
 
 
-function xsd2json(filename, callback) {
-  var outputStream = childProcess.spawn(PROLOG, ['-q', '-f', XSD2JSON, filename]);
-
+function xsd2json(filename, options, callback) {
   if (arguments.length === 1) {
+    options = {};
+    callback = null;
+  }
+  else if (arguments.length === 2) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    else {
+      callback = null;
+    }
+  }
+
+  var spawnArgs = ['-x', XSD2JSON, filename];
+  if (options.trace) {
+    spawnArgs.push('trace');
+  }
+
+  var outputStream = childProcess.spawn(PROLOG, spawnArgs);
+
+  if (typeof callback !== 'function') {
     // no callback given --> return stream
     return outputStream;
   }
 
-  outputStream.pipe(reader(callback));
+  outputStream.stderr.on('data', function(err) {
+    if (options.trace) {
+      var lines = err.toString().split(/\n/);
+      lines.forEach(function(line) {
+        if (/^CHR:\s+\([0-9]+\)\s+Apply:.*$/.test(line)) {
+          console.log(line);
+        }
+      });
+    }
+    else {
+      callback(err);
+    }
+  });
+
+  outputStream.stdout.pipe(reader(callback));
 }
 
 
@@ -27,7 +60,7 @@ function reader(callback) {
     try {
       var schema = JSON.parse(jsonString);
     } catch(err) {
-      callback(err);
+      return callback(err);
     }
 
     callback(null, schema);

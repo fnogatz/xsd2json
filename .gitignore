@@ -32,3 +32,6 @@ node_modules
 
 # under development
 test/in-progress
+
+# Prolog qlf file
+lib-pl/cli
