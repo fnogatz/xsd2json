@@ -72,7 +72,7 @@ merge_json(json([Key=Value|Rest_JSON_List1]),json(JSON_List2),json(Merged),On_Co
   \+atom(Value),
   % couldn't be merged --> rename
   On_Conflict == 9,
-  New_Key = '@'Key,
+  string_concat('@',Key,New_Key),
   merge_json(json([New_Key=Value|Rest_JSON_List1]),json(JSON_List2),json(Merged),On_Conflict).
 
 merge_json(json([Key=Value|Rest_JSON_List1]),json(JSON_List2),json(Merged),On_Conflict) :-
