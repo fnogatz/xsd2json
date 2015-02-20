@@ -9,15 +9,16 @@ program
   .usage('[options] <XSD>')
   .option('-i, --indentation <spaces>')
   .option('-t, --trace')
+  .option('-u, --uncompiled')
   .parse(process.argv);
 
 spinner();
 
 var filename = program.args[0];
 
-var options = {};
-if (program.trace) {
-  options.trace = true
+var options = {
+  trace: program.trace,
+  uncompiled: program.uncompiled
 };
 
 xsd2json(filename, options, function(err, schema) {

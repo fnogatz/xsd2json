@@ -5,8 +5,21 @@ var concat = require('concat-stream');
 var path = require('path');
 
 
+// Prolog executable:
 var PROLOG = process.env.SWIPL || 'swipl';
-var XSD2JSON = process.env.XSD2JSON || path.resolve(__dirname, 'lib-pl', 'cli');
+
+var SOURCE = {
+  // Compiled (qlf) Prolog file, created by `npm run-script create-qlf`:
+  COMPILED: {
+    exec: process.env.XSD2JSON || path.resolve(__dirname, 'lib-pl', 'cli'),
+    args: ['-x']
+  },
+  // Uncompiled Prolog file, for on-the-fly translations (e.g. for development purposes):
+  UNCOMPILED: {
+    exec: process.env.XSD2JSONPL || path.resolve(__dirname, 'lib-pl', 'cli.pl'),
+    args: ['-q', '-g', 'main', '-s']
+  }
+};
 
 
 function xsd2json(filename, options, callback) {
@@ -24,7 +37,18 @@ function xsd2json(filename, options, callback) {
     }
   }
 
-  var spawnArgs = ['-x', XSD2JSON, filename];
+  var exec;
+  var spawnArgs;
+  if (options.uncompiled) {
+    exec = SOURCE.UNCOMPILED.exec;
+    spawnArgs = SOURCE.UNCOMPILED.args;
+  }
+  else {
+    exec = SOURCE.COMPILED.exec;
+    spawnArgs = SOURCE.COMPILED.args;
+  }
+  spawnArgs.push(exec, filename);
+
   if (options.trace) {
     spawnArgs.push('trace');
   }
