@@ -47,7 +47,7 @@ function xsd2json(filename, options, callback) {
     exec = SOURCE.COMPILED.exec;
     spawnArgs = SOURCE.COMPILED.args;
   }
-  spawnArgs.push(exec, filename);
+  spawnArgs = spawnArgs.concat([exec, filename]);
 
   if (options.trace) {
     spawnArgs.push('trace');
