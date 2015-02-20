@@ -39,7 +39,7 @@ function xsd2json(filename, options, callback) {
 
   var exec;
   var spawnArgs;
-  if (options.uncompiled) {
+  if (options.uncompiled || process.env.USEPL === 'uncompiled') {
     exec = SOURCE.UNCOMPILED.exec;
     spawnArgs = SOURCE.UNCOMPILED.args;
   }
