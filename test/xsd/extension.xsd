@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<xs:schema>
+  <xs:complexType name="pets">
+    <xs:all>
+      <xs:element name="dog" type="xs:string" />
+      <xs:element name="cat" type="xs:string" />
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="morePets">
+    <xs:complexContent>
+      <xs:extension base="pets">
+        
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:schema>

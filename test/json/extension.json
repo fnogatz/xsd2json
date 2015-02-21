@@ -1,0 +1,19 @@
+{
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "dog": {
+          "type": "string"
+        },
+        "cat": {
+          "type": "string"
+        }
+      },
+      "required": ["dog", "cat"]
+    },
+    "morePets": {
+      "$ref": "#/definitions/pets"
+    }
+  }
+}

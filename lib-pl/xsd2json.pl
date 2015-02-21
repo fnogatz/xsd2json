@@ -1102,6 +1102,57 @@ node(IName,Namespace,attribute,Attribute_ID,_Attribute_Children,_Parent_ID)
 
 
 /**
+ * ##########  XS:EXTENSION  ##########
+ */
+
+/**
+ * Extension base is a self defined data type, but base has no
+ *   children, i.e. it's only an alias.
+ */
+transform(IName),
+    node(IName,Namespace,extension,Extension_ID,[],_Parent_ID),
+    node_attribute(IName,Extension_ID,base,Base,_)
+  ==>
+    xsd_namespace(Namespace),
+    \+namespace(Base,_Base_Namespace,_Base_Type)
+  |
+    string_concat('#/definitions/',Base,Base_Reference),
+    JSON = [
+      '$ref'= Base_Reference
+    ],
+    json(IName,Extension_ID,json(JSON)).
+
+
+transform(IName),
+    node(IName,Namespace,extension,Extension_ID,Extension_Children,_Parent_ID),
+    node_attribute(IName,Extension_ID,base,Base,_)
+  ==>
+    xsd_namespace(Namespace),
+    \+namespace(Base,_Base_Namespace,_Base_Type),
+    Extension_Children \= []
+  |
+    string_concat('#/definitions/',Base,Base_Reference),
+    JSON = [
+      facets= json([]),
+      base= json([ '$ref'= Base_Reference ])
+    ],
+    json(IName,Extension_ID,json(JSON)).
+
+
+transform(IName),
+    node(IName,NS1,extension,Extension_ID,_Extension_Children,_Parent_ID),
+    node(IName,NS2,all,All_ID,_All_Children,Extension_ID),
+    json(IName,All_ID,All_JSON)
+  ==>
+    xsd_namespaces([NS1,NS2])
+  |
+    JSON = [
+      facets= All_JSON
+    ],
+    json(IName,Extension_ID,json(JSON)).
+
+
+/**
  * ##########  XS:RESTRICTION  ##########
  */
 
@@ -1450,6 +1501,20 @@ transform(IName),
     xsd_namespaces([NS1,NS2])
   |
     json(IName,ComplexType_ID,Sequence_JSON).
+
+
+/**
+ * `xs:complexType` which has `xs:complexContent/xs:extension` children.
+ */
+transform(IName), 
+    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
+    node(IName,NS2,complexContent,ComplexContent_ID,_ComplexContent_Children,ComplexType_ID),
+    node(IName,NS3,extension,Extension_ID,_Extension_Children,ComplexContent_ID),
+    json(IName,Extension_ID,Extension_JSON)
+  ==>
+    xsd_namespaces([NS1,NS2,NS3])
+  |
+    json(IName,ComplexType_ID,Extension_JSON).
 
 
 /**
