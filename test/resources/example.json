@@ -25,5 +25,7 @@
 	"aGroupElement": "test",
 	"id": "myId",
 	"anySimpleTypeElement": "test",
-	"anyTypeElement": {}
+	"anyTypeElement": {},
+	"group2str": "test",
+	"group3str": "test"
 }

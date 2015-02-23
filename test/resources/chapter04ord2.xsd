@@ -13,13 +13,36 @@
     </xs:sequence>
   </xs:group>
 
+  <xs:group name="group2">
+    <xs:sequence>
+      <xs:element name="group2str" type="xs:string"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="group3">
+    <xs:sequence>
+      <xs:element name="group3str" type="xs:string"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="group4">
+    <xs:sequence>
+      <xs:element name="group4str" type="xs:string"/>
+    </xs:sequence>
+  </xs:group>
+
   <!-- A complex type representing an order. Is uses types included from other schemas as elements -->
   <xs:complexType name="OrderType">
     <xs:group ref="orderGroup" />
     <xs:sequence>
       <xs:element name="number" type="OrderNumType"/>
       <xs:element ref="customer" minOccurs="0"/>
+      <xs:group ref="group2" />
       <xs:element ref="prod:items" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:choice>
+        <xs:group ref="group3" />
+        <xs:group ref="group4" />
+      </xs:choice>
     </xs:sequence>
   </xs:complexType>
 

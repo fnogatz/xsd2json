@@ -10,14 +10,16 @@
       "pattern": ".{0,256}",
       "type": "string"
     },
-    "exampleorgord:CompletedOrderTypeCHOICE0": {
+    "exampleorgord:CompletedOrderTypeCHOICE0CHOICE0": {
       "required": [
         "number",
         "date",
         "id",
         "anySimpleTypeElement",
         "anyTypeElement",
-        "aGroupElement"
+        "aGroupElement",
+        "group2str",
+        "group3str"
       ],
       "type": "object",
       "properties": {
@@ -61,17 +63,87 @@
         "anyTypeElement": {},
         "aGroupElement": {
           "type": "string"
+        },
+        "group2str": {
+          "type": "string"
+        },
+        "group3str": {
+          "type": "string"
         }
       }
     },
-    "exampleorgord:CompletedOrderTypeCHOICE1": {
+    "exampleorgord:CompletedOrderTypeCHOICE0CHOICE1": {
+      "required": [
+        "number",
+        "date",
+        "id",
+        "anySimpleTypeElement",
+        "anyTypeElement",
+        "aGroupElement",
+        "group2str",
+        "group4str"
+      ],
+      "type": "object",
+      "properties": {
+        "number": {
+          "$ref": "#/definitions/exampleorgord:OrderNumType"
+        },
+        "customer": {
+          "$ref": "#/definitions/exampleorgord:CustomerType"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleorgprod:ItemsType"
+          },
+          "minItems": 0
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "anySimpleTypeElement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "anyTypeElement": {},
+        "aGroupElement": {
+          "type": "string"
+        },
+        "group2str": {
+          "type": "string"
+        },
+        "group4str": {
+          "type": "string"
+        }
+      }
+    },
+    "exampleorgord:CompletedOrderTypeCHOICE1CHOICE0": {
       "required": [
         "number",
         "id",
         "anySimpleTypeElement",
         "anyTypeElement",
         "anotherChoice",
-        "aGroupElement"
+        "aGroupElement",
+        "group2str",
+        "group3str"
       ],
       "type": "object",
       "properties": {
@@ -113,6 +185,187 @@
           "type": "boolean"
         },
         "aGroupElement": {
+          "type": "string"
+        },
+        "group2str": {
+          "type": "string"
+        },
+        "group3str": {
+          "type": "string"
+        }
+      }
+    },
+    "exampleorgord:CompletedOrderTypeCHOICE1CHOICE1": {
+      "required": [
+        "number",
+        "id",
+        "anySimpleTypeElement",
+        "anyTypeElement",
+        "anotherChoice",
+        "aGroupElement",
+        "group2str",
+        "group4str"
+      ],
+      "type": "object",
+      "properties": {
+        "number": {
+          "$ref": "#/definitions/exampleorgord:OrderNumType"
+        },
+        "customer": {
+          "$ref": "#/definitions/exampleorgord:CustomerType"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleorgprod:ItemsType"
+          },
+          "minItems": 0
+        },
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "anySimpleTypeElement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "anyTypeElement": {},
+        "anotherChoice": {
+          "type": "boolean"
+        },
+        "aGroupElement": {
+          "type": "string"
+        },
+        "group2str": {
+          "type": "string"
+        },
+        "group4str": {
+          "type": "string"
+        }
+      }
+    },
+    "exampleorgord:OrderTypeCHOICE0": {
+      "required": [
+        "number",
+        "id",
+        "anySimpleTypeElement",
+        "anyTypeElement",
+        "aGroupElement",
+        "group2str",
+        "group3str"
+      ],
+      "type": "object",
+      "properties": {
+        "number": {
+          "$ref": "#/definitions/exampleorgord:OrderNumType"
+        },
+        "customer": {
+          "$ref": "#/definitions/exampleorgord:CustomerType"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleorgprod:ItemsType"
+          },
+          "minItems": 0
+        },
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "anySimpleTypeElement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "anyTypeElement": {},
+        "aGroupElement": {
+          "type": "string"
+        },
+        "group2str": {
+          "type": "string"
+        },
+        "group3str": {
+          "type": "string"
+        }
+      }
+    },
+    "exampleorgord:OrderTypeCHOICE1": {
+      "required": [
+        "number",
+        "id",
+        "anySimpleTypeElement",
+        "anyTypeElement",
+        "aGroupElement",
+        "group2str",
+        "group4str"
+      ],
+      "type": "object",
+      "properties": {
+        "number": {
+          "$ref": "#/definitions/exampleorgord:OrderNumType"
+        },
+        "customer": {
+          "$ref": "#/definitions/exampleorgord:CustomerType"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/exampleorgprod:ItemsType"
+          },
+          "minItems": 0
+        },
+        "id": {
+          "type": "string",
+          "format": "uri"
+        },
+        "anySimpleTypeElement": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "anyTypeElement": {},
+        "aGroupElement": {
+          "type": "string"
+        },
+        "group2str": {
+          "type": "string"
+        },
+        "group4str": {
           "type": "string"
         }
       }
@@ -201,7 +454,7 @@
         "system": {
           "type": "string"
         },
-        "@value": {
+        "value": {
           "type": "integer"
         }
       },
@@ -213,10 +466,26 @@
     "exampleorgord:CompletedOrderType": {
       "anyOf": [
         {
-          "$ref": "#/definitions/exampleorgord:CompletedOrderTypeCHOICE0"
+          "$ref": "#/definitions/exampleorgord:CompletedOrderTypeCHOICE0CHOICE0"
         },
         {
-          "$ref": "#/definitions/exampleorgord:CompletedOrderTypeCHOICE1"
+          "$ref": "#/definitions/exampleorgord:CompletedOrderTypeCHOICE0CHOICE1"
+        },
+        {
+          "$ref": "#/definitions/exampleorgord:CompletedOrderTypeCHOICE1CHOICE0"
+        },
+        {
+          "$ref": "#/definitions/exampleorgord:CompletedOrderTypeCHOICE1CHOICE1"
+        }
+      ]
+    },
+    "exampleorgord:OrderType": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/exampleorgord:OrderTypeCHOICE0"
+        },
+        {
+          "$ref": "#/definitions/exampleorgord:OrderTypeCHOICE1"
         }
       ]
     }

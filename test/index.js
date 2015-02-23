@@ -31,7 +31,7 @@ describe('xsd2json', function() {
 
 	var jsonSchema;
 	it('should generate a json schema', function(done) {
-		this.timeout(10000);
+		this.timeout(20000);
 		xsd2json.xsd2jsonWrapper(mergedSchemaStr, function(err, schema) {
 			jsonSchema = JSON.parse(schema);
 			done(err);
@@ -40,14 +40,16 @@ describe('xsd2json', function() {
 
 	it('should cure a few defaults of the json schema', function() {
 		xsd2json.postProcessing(jsonSchema);
+		//console.log(JSON.stringify(jsonSchema, null, 2));
 		jsonSchema.should.eql(schemaResult);
+
+		// do not authorize additional properties in the following test. It prevents some ambiguities.
+		_.each(jsonSchema.definitions, function(definition) {
+			if (!definition.anyOf) definition.additionalProperties = false;
+		});
 	});
 
 	it('should validate the example document against the produced schema', function() {
-		// do not authorize additional properties in this test. It prevents some ambiguities.
-		jsonSchema.definitions['exampleorgord:CompletedOrderTypeCHOICE0'].additionalProperties = false;
-		jsonSchema.definitions['exampleorgord:CompletedOrderTypeCHOICE1'].additionalProperties = false;
-
 		var errors = js.validate(exampleInstance, jsonSchema);
 		if (errors.length > 0) {
 			//console.log('Validation errors');
@@ -57,10 +59,6 @@ describe('xsd2json', function() {
 	});
 
 	it('should reject the example document with complex object in anySimpleType element', function() {
-		// do not authorize additional properties in this test. It prevents some ambiguities.
-		jsonSchema.definitions['exampleorgord:CompletedOrderTypeCHOICE0'].additionalProperties = false;
-		jsonSchema.definitions['exampleorgord:CompletedOrderTypeCHOICE1'].additionalProperties = false;
-
 		var example = _.cloneDeep(exampleInstance);
 		example.anySimpleTypeElement = {};
 
