@@ -46,6 +46,7 @@
     </xs:sequence>
     <s:attribute name="attrNormStr" type="xs:normalizedString"/>
     <s:attribute ref="xml:lang" use="optional"/>
+    <s:attribute name="lang2" type="xs:language" use="optional"/>
   </xs:complexType>
 
   <xs:simpleType name="OrderNumType">

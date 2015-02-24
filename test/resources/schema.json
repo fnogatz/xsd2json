@@ -1,9 +1,9 @@
 {
   "definitions": {
-    "exampleorgord:CustNameType": {
+    "exampleorgord:OrderNumType": {
       "type": "string"
     },
-    "exampleorgord:OrderNumType": {
+    "exampleorgord:CustNameType": {
       "type": "string"
     },
     "exampleorgprod:name": {
@@ -104,10 +104,8 @@
       ]
     },
     "exampleorgord:OrderTypeCHOICE1": {
+      "type": "object",
       "properties": {
-        "attrNormStr": {
-          "type": "string"
-        },
         "number": {
           "$ref": "#/definitions/exampleorgord:OrderNumType"
         },
@@ -151,11 +149,16 @@
         "group4str": {
           "type": "string"
         },
+        "attrNormStr": {
+          "type": "string"
+        },
+        "lang2": {
+          "type": "string"
+        },
         "lang": {
           "type": "string"
         }
       },
-      "type": "object",
       "required": [
         "number",
         "id",
@@ -167,10 +170,8 @@
       ]
     },
     "exampleorgord:OrderTypeCHOICE0": {
+      "type": "object",
       "properties": {
-        "attrNormStr": {
-          "type": "string"
-        },
         "number": {
           "$ref": "#/definitions/exampleorgord:OrderNumType"
         },
@@ -214,11 +215,16 @@
         "group3str": {
           "type": "string"
         },
+        "attrNormStr": {
+          "type": "string"
+        },
+        "lang2": {
+          "type": "string"
+        },
         "lang": {
           "type": "string"
         }
       },
-      "type": "object",
       "required": [
         "number",
         "id",
@@ -230,10 +236,8 @@
       ]
     },
     "exampleorgord:CompletedOrderTypeCHOICE1CHOICE1": {
+      "type": "object",
       "properties": {
-        "attrNormStr": {
-          "type": "string"
-        },
         "number": {
           "$ref": "#/definitions/exampleorgord:OrderNumType"
         },
@@ -280,11 +284,16 @@
         "group4str": {
           "type": "string"
         },
+        "attrNormStr": {
+          "type": "string"
+        },
+        "lang2": {
+          "type": "string"
+        },
         "lang": {
           "type": "string"
         }
       },
-      "type": "object",
       "required": [
         "number",
         "id",
@@ -297,10 +306,8 @@
       ]
     },
     "exampleorgord:CompletedOrderTypeCHOICE1CHOICE0": {
+      "type": "object",
       "properties": {
-        "attrNormStr": {
-          "type": "string"
-        },
         "number": {
           "$ref": "#/definitions/exampleorgord:OrderNumType"
         },
@@ -347,11 +354,16 @@
         "group3str": {
           "type": "string"
         },
+        "attrNormStr": {
+          "type": "string"
+        },
+        "lang2": {
+          "type": "string"
+        },
         "lang": {
           "type": "string"
         }
       },
-      "type": "object",
       "required": [
         "number",
         "id",
@@ -364,10 +376,8 @@
       ]
     },
     "exampleorgord:CompletedOrderTypeCHOICE0CHOICE1": {
+      "type": "object",
       "properties": {
-        "attrNormStr": {
-          "type": "string"
-        },
         "number": {
           "$ref": "#/definitions/exampleorgord:OrderNumType"
         },
@@ -415,11 +425,16 @@
         "group4str": {
           "type": "string"
         },
+        "attrNormStr": {
+          "type": "string"
+        },
+        "lang2": {
+          "type": "string"
+        },
         "lang": {
           "type": "string"
         }
       },
-      "type": "object",
       "required": [
         "number",
         "date",
@@ -432,10 +447,8 @@
       ]
     },
     "exampleorgord:CompletedOrderTypeCHOICE0CHOICE0": {
+      "type": "object",
       "properties": {
-        "attrNormStr": {
-          "type": "string"
-        },
         "number": {
           "$ref": "#/definitions/exampleorgord:OrderNumType"
         },
@@ -483,11 +496,16 @@
         "group3str": {
           "type": "string"
         },
+        "attrNormStr": {
+          "type": "string"
+        },
+        "lang2": {
+          "type": "string"
+        },
         "lang": {
           "type": "string"
         }
       },
-      "type": "object",
       "required": [
         "number",
         "date",
