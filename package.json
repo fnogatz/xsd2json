@@ -1,6 +1,6 @@
 {
   "name": "xsd2json2",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Wrap the original xsd2json prolog programme with pre and post-processing to complete its functionalities.",
   "main": "index.js",
   "scripts": {
