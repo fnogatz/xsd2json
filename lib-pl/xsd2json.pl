@@ -1531,14 +1531,19 @@ transform(IName),
  *   - id
  */
 transform(IName), 
-    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID),
+    node(IName,NS1,ParentEl,ParentEl_ID,_ParentEl_Children,_ParentEl_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ParentEl_ID),
     node_attribute(IName,Attribute_ID,name,Attribute_Name,_),
     node_attribute(IName,Attribute_ID,type,Type_With_NS,_),
     node_attribute(IName,Attribute_ID,use,Use,_),
     node_attribute(IName,Attribute_ID,fixed,Fixed,_),
     node_attribute(IName,Attribute_ID,default,Default,_)
   ==>
+    (
+      ParentEl == complexType
+    ;
+      ParentEl == extension
+    ),
     \+var(Type_With_NS),
     xsd_namespaces([NS1,NS2]),
     reference_type(Type_With_NS,json(Attribute_JSON))
@@ -1583,7 +1588,14 @@ transform(IName),
         Use \= required,
         JSON2 = JSON1
     ),
-    json(IName,ComplexType_ID,json(JSON2)).
+    (
+      ParentEl == complexType,
+      json(IName,ParentEl_ID,json(JSON2))
+    ;
+      ParentEl == extension,
+      JSON_Extension = [facets= json(JSON2)],
+      json(IName,ParentEl_ID,json(JSON_Extension))
+    ).
 
 
 /**
@@ -1595,16 +1607,21 @@ transform(IName),
  *   `xs:simpleType` has been generated.
  */
 transform(IName), 
+    node(IName,NS1,ParentEl,ParentEl_ID,_ParentEl_Children,_ParentEl_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ParentEl_ID),
     node(IName,NS3,simpleType,SimpleType_ID,_SimpleType_Children,Attribute_ID),
     json(IName,SimpleType_ID,json(SimpleType_JSON)),
-    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID),
     node_attribute(IName,Attribute_ID,name,Attribute_Name,_),
     node_attribute(IName,Attribute_ID,type,Unbound_Type,_),
     node_attribute(IName,Attribute_ID,use,Use,_),
     node_attribute(IName,Attribute_ID,fixed,Fixed,_),
     node_attribute(IName,Attribute_ID,default,Default,_)
   ==>
+    (
+      ParentEl == complexType
+    ;
+      ParentEl == extension
+    ),
     var(Unbound_Type),
     xsd_namespaces([NS1,NS2,NS3])
   |
@@ -1648,7 +1665,14 @@ transform(IName),
         Use \= required,
         JSON2 = JSON1
     ),
-    json(IName,ComplexType_ID,json(JSON2)).
+    (
+      ParentEl == complexType,
+      json(IName,ParentEl_ID,json(JSON2))
+    ;
+      ParentEl == extension,
+      JSON_Extension = [facets= json(JSON2)],
+      json(IName,ParentEl_ID,json(JSON_Extension))
+    ).
 
 
 /**
@@ -1659,13 +1683,18 @@ transform(IName),
  *   present.
  */
 transform(IName), 
-    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
-    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ComplexType_ID),
+    node(IName,NS1,ParentEl,ParentEl_ID,_ParentEl_Children,_ParentEl_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ParentEl_ID),
     node_attribute(IName,Attribute_ID,ref,Ref,_),
     node_attribute(IName,Attribute_ID,use,Use,_),
     node_attribute(IName,Attribute_ID,fixed,_Fixed,_),
     node_attribute(IName,Attribute_ID,default,_Default,_)
   ==>
+    (
+      ParentEl == complexType
+    ;
+      ParentEl == extension
+    ),
     xsd_namespaces([NS1,NS2])
   |
     string_concat('#/definitions/@',Ref,Definition_Ref),
@@ -1686,7 +1715,14 @@ transform(IName),
         Use \= required,
         JSON2 = JSON1
     ),
-    json(IName,ComplexType_ID,json(JSON2)).
+    (
+      ParentEl == complexType,
+      json(IName,ParentEl_ID,json(JSON2))
+    ;
+      ParentEl == extension,
+      JSON_Extension = [facets= json(JSON2)],
+      json(IName,ParentEl_ID,json(JSON_Extension))
+    ).
 
 
 /**
