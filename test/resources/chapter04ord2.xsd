@@ -44,6 +44,8 @@
         <xs:group ref="group4" />
       </xs:choice>
     </xs:sequence>
+    <s:attribute name="attrNormStr" type="xs:normalizedString"/>
+    <s:attribute name="xml:lang" type="xs:string"/>
   </xs:complexType>
 
   <xs:simpleType name="OrderNumType">
