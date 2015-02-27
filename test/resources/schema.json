@@ -290,6 +290,9 @@
         "lang2": {
           "type": "string"
         },
+        "extAttr": {
+          "type": "string"
+        },
         "lang": {
           "type": "string"
         }
@@ -358,6 +361,9 @@
           "type": "string"
         },
         "lang2": {
+          "type": "string"
+        },
+        "extAttr": {
           "type": "string"
         },
         "lang": {
@@ -431,6 +437,9 @@
         "lang2": {
           "type": "string"
         },
+        "extAttr": {
+          "type": "string"
+        },
         "lang": {
           "type": "string"
         }
@@ -500,6 +509,9 @@
           "type": "string"
         },
         "lang2": {
+          "type": "string"
+        },
+        "extAttr": {
           "type": "string"
         },
         "lang": {

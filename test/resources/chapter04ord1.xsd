@@ -25,6 +25,7 @@
             <xs:element name="anotherChoice" type="xs:boolean"/>
           </xs:sequence>
         </xs:choice>
+        <xs:attribute name="extAttr" type="xs:string"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

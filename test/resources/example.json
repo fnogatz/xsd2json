@@ -27,5 +27,6 @@
 	"anySimpleTypeElement": "test",
 	"anyTypeElement": {},
 	"group2str": "test",
-	"group3str": "test"
+	"group3str": "test",
+	"extAttr": "test"
 }
