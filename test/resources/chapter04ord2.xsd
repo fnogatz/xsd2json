@@ -47,7 +47,15 @@
     <s:attribute name="attrNormStr" type="xs:normalizedString"/>
     <s:attribute ref="xml:lang" use="optional"/>
     <s:attribute name="lang2" type="xs:language" use="optional"/>
+    <s:attribute name="enumVal" type="EnumType" default="USER"/>
   </xs:complexType>
+
+  <s:simpleType name="EnumType">
+    <s:restriction base="s:string">
+      <s:enumeration value="ADMINISTRATOR"/>
+      <s:enumeration value="USER"/>
+    </s:restriction>
+  </s:simpleType>
 
   <xs:simpleType name="OrderNumType">
     <!-- do not support unions yet. This will simply processed as a string-->

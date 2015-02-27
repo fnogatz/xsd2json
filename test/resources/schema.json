@@ -6,6 +6,13 @@
     "exampleorgord:CustNameType": {
       "type": "string"
     },
+    "exampleorgord:EnumType": {
+      "enum": [
+        "ADMINISTRATOR",
+        "USER"
+      ],
+      "type": "string"
+    },
     "exampleorgprod:name": {
       "pattern": ".{0,256}",
       "type": "string"
@@ -155,6 +162,9 @@
         "lang2": {
           "type": "string"
         },
+        "enumVal": {
+          "$ref": "#/definitions/exampleorgord:EnumType"
+        },
         "lang": {
           "type": "string"
         }
@@ -220,6 +230,9 @@
         },
         "lang2": {
           "type": "string"
+        },
+        "enumVal": {
+          "$ref": "#/definitions/exampleorgord:EnumType"
         },
         "lang": {
           "type": "string"
@@ -289,6 +302,9 @@
         },
         "lang2": {
           "type": "string"
+        },
+        "enumVal": {
+          "$ref": "#/definitions/exampleorgord:EnumType"
         },
         "extAttr": {
           "type": "string"
@@ -362,6 +378,9 @@
         },
         "lang2": {
           "type": "string"
+        },
+        "enumVal": {
+          "$ref": "#/definitions/exampleorgord:EnumType"
         },
         "extAttr": {
           "type": "string"
@@ -437,6 +456,9 @@
         "lang2": {
           "type": "string"
         },
+        "enumVal": {
+          "$ref": "#/definitions/exampleorgord:EnumType"
+        },
         "extAttr": {
           "type": "string"
         },
@@ -510,6 +532,9 @@
         },
         "lang2": {
           "type": "string"
+        },
+        "enumVal": {
+          "$ref": "#/definitions/exampleorgord:EnumType"
         },
         "extAttr": {
           "type": "string"

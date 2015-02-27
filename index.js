@@ -21,7 +21,7 @@ exports.xsd2json = function(filePath, callback) {
 		var mergedSchema = xsdExtensions.mergeExtensions(schema);
 		var builder = new xml2js.Builder();
 		var xml = builder.buildObject(mergedSchema);
-
+		
 		prologWrapper.xsd2jsonWrapper(xml, function(err, schema) {
 			if (err) return callback(err);
 			callback(null, jsonProcessing.postProcessing(schema));
