@@ -18,13 +18,11 @@ Or simply clone this repository:
 
 	$ git clone https://github.com/fnogatz/xsd2json.git
 
-
 ## Usage as CLI
 
 If you install xsd2json via npm it will create a new command `xsd2json`:
 
 	$ xsd2json /path/to/your.xsd > /created/schema.json
-
 
 ## Usage with node.js
 
@@ -42,18 +40,21 @@ The xsd2json module can be used programmatically as function or stream:
 	  console.log(JSON.stringify(schemaObject, null, 2));
 	});
 
-
 ## Usage with Prolog
 
 xsd2json provides a predicate `xsd2json(+XSD,-JSON)`, which holds for a given XML Schema (either file path, URL or `stream`). For instructions on how to use xsd2json programmatically in Prolog, have a look at the Prolog module's [Readme](https://github.com/fnogatz/xsd2json/tree/master/lib-pl).
-
 
 ## Background
 
 This tool has been developed as part of my Bachelor's Thesis at University of Ulm, Germany. The thesis ([PDF](http://www.informatik.uni-ulm.de/pm/fileadmin/pm/home/fruehwirth/drafts/Bsc-Nogatz.pdf)) explains the general idea of the translation process via Prolog and [Constraint Handling Rules](http://dtai.cs.kuleuven.be/CHR/about.shtml) (CHR). It also contains tabular and graphical representations of the implemented translations of XML Schema fragments. A shorter explanation of the translation process can be found in the CHR Workshop paper ["From XML Schema to JSON Schema:
 Translation with CHR"](http://arxiv.org/pdf/1406.2125v1.pdf).
 
-
 ## Project Structure
 
 xsd2json is developed in a test-driven way. This reflects in the project's folder structure, too: The `/lib-pl` directory contains the Prolog and CHR stuff while you will find the [TAP](http://testanything.org/) testing framework implemented in [node.js](http://nodejs.org/) under `/test`. Both directories contain their own Readme-File that explain their usage.
+
+
+## Alternatives
+
+* [node-xsd2json](https://github.com/MGDIS/xsd2json) (Fork of this module.)
+* [Jsonix Schema Compiler](https://github.com/highsource/jsonix-schema-compiler)
