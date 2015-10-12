@@ -14,7 +14,7 @@
       "type": "string"
     },
     "exampleorgprod:name": {
-      "pattern": ".{0,256}",
+      "pattern": "^.{0,256}$",
       "type": "string"
     },
     "exampleorgord:CustomerType": {
