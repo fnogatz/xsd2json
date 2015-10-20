@@ -5,10 +5,11 @@
   "main": "index.js",
   "bin": "./bin/xsd2json",
   "scripts": {
-    "prepublish": "npm run-script create-qlf",
-    "pretest": "npm run-script create-qlf",
+    "prepublish": "npm run create-qlf",
+    "pretest": "npm run create-qlf",
     "create-qlf": "swipl --goal=main -o lib-pl/cli -c lib-pl/cli.pl",
-    "test": "npm run-script test-converter",
+    "standard": "standard",
+    "test": "npm run standard && npm run test-converter",
     "test-converter": "node test/index.js interpreted",
     "test-examples": "node test/index.js validate-json"
   },
@@ -35,8 +36,9 @@
   "devDependencies": {
     "async": "^0.9.0",
     "interpreted": "^0.5.0",
+    "jayschema": "^0.3.1",
     "nomnom": "^1.8.0",
-    "tap": "^0.4.13",
-    "jayschema": "^0.3.1"
+    "standard": "^5.3.1",
+    "tap": "^0.4.13"
   }
 }

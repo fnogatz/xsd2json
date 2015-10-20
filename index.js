@@ -1,12 +1,11 @@
-module.exports = xsd2json;
+module.exports = xsd2json
 
-var childProcess = require('child_process');
-var concat = require('concat-stream');
-var path = require('path');
-
+var childProcess = require('child_process')
+var concat = require('concat-stream')
+var path = require('path')
 
 // Prolog executable:
-var PROLOG = process.env.SWIPL || 'swipl';
+var PROLOG = process.env.SWIPL || 'swipl'
 
 var SOURCE = {
   // Compiled (qlf) Prolog file, created by `npm run-script create-qlf`:
@@ -19,74 +18,68 @@ var SOURCE = {
     exec: process.env.XSD2JSONPL || path.resolve(__dirname, 'lib-pl', 'cli.pl'),
     args: ['-q', '-g', 'main', '-s']
   }
-};
+}
 
-
-function xsd2json(filename, options, callback) {
+function xsd2json (filename, options, callback) {
   if (arguments.length === 1) {
-    options = {};
-    callback = null;
-  }
-  else if (arguments.length === 2) {
+    options = {}
+    callback = null
+  } else if (arguments.length === 2) {
     if (typeof options === 'function') {
-      callback = options;
-      options = {};
-    }
-    else {
-      callback = null;
+      callback = options
+      options = {}
+    } else {
+      callback = null
     }
   }
 
-  var exec;
-  var spawnArgs;
+  var exec
+  var spawnArgs
   if (options.uncompiled || process.env.USEPL === 'uncompiled') {
-    exec = SOURCE.UNCOMPILED.exec;
-    spawnArgs = SOURCE.UNCOMPILED.args;
+    exec = SOURCE.UNCOMPILED.exec
+    spawnArgs = SOURCE.UNCOMPILED.args
+  } else {
+    exec = SOURCE.COMPILED.exec
+    spawnArgs = SOURCE.COMPILED.args
   }
-  else {
-    exec = SOURCE.COMPILED.exec;
-    spawnArgs = SOURCE.COMPILED.args;
-  }
-  spawnArgs = spawnArgs.concat([exec, filename]);
+  spawnArgs = spawnArgs.concat([exec, filename])
 
   if (options.trace) {
-    spawnArgs.push('trace');
+    spawnArgs.push('trace')
   }
 
-  var outputStream = childProcess.spawn(PROLOG, spawnArgs);
+  var outputStream = childProcess.spawn(PROLOG, spawnArgs)
 
   if (typeof callback !== 'function') {
     // no callback given --> return stream
-    return outputStream;
+    return outputStream
   }
 
-  outputStream.stderr.on('data', function(err) {
+  outputStream.stderr.on('data', function (err) {
     if (options.trace) {
-      var lines = err.toString().split(/\n/);
-      lines.forEach(function(line) {
+      var lines = err.toString().split(/\n/)
+      lines.forEach(function (line) {
         if (/^CHR:\s+\([0-9]+\)\s+Apply:.*$/.test(line)) {
-          console.log(line);
+          console.log(line)
         }
-      });
+      })
+    } else {
+      callback(err)
     }
-    else {
-      callback(err);
-    }
-  });
+  })
 
-  outputStream.stdout.pipe(reader(callback));
+  outputStream.stdout.pipe(reader(callback))
 }
 
-
-function reader(callback) {
-  return concat(function(jsonBuff) {
-    var jsonString = jsonBuff.toString();
+function reader (callback) {
+  return concat(function (jsonBuff) {
+    var jsonString = jsonBuff.toString()
     try {
-      var schema = JSON.parse(jsonString);
-    } catch(err) {
-      return callback(err);
+      var schema = JSON.parse(jsonString)
+    } catch (err) {
+      return callback(err)
     }
 
-    callback(null, schema);
-  });
+    callback(null, schema)
+  })
 }
