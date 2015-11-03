@@ -1,0 +1,14 @@
+{
+  "definitions": {
+    "recursive": {
+      "required": [ "node" ],
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/recursive"
+        }
+      }
+    }
+  },
+  "$ref": "#/definitions/recursive"
+}
