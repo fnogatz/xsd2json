@@ -3,7 +3,7 @@
 >
   <xs:element name="node" type="recursive" />
 
-  <xs:complexType name="recursive">    
+  <xs:complexType name="recursive">
     <xs:sequence minOccurs="0" maxOccurs="unbounded">
       <xs:element name="node" type="recursive" />
     </xs:sequence>

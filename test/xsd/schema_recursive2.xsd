@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<xs:schema>
+>
+  <xs:element name="node" type="recursive1" />
+
+  <xs:complexType name="recursive1">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="node" type="recursive2" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="recursive2">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="node" type="recursive1" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
