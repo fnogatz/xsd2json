@@ -1,0 +1,15 @@
+{
+  "properties": {
+    "orderid": {
+      "type": "string"
+    },
+    "orderperson": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "orderid",
+    "orderperson"
+  ],
+  "type": "object"
+}

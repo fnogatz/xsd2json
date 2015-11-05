@@ -1317,6 +1317,22 @@ transform(IName),
 
 
 /**
+ * Nested `xs:element/xs:complexType` structure with `name`
+ *   attribute set.
+ */
+transform(IName), 
+    node(IName,NS1,element,Element_ID,_Element_Children,_Element_Parent_ID),
+    node(IName,NS2,complexType,ComplexType_ID,_ComplexType_Children,Element_ID),
+    node_attribute(IName,Element_ID,name,Name,_),
+    json(IName,ComplexType_ID,ComplexType_JSON)
+  ==>
+    xsd_namespaces([NS1,NS2])
+  |
+    json(IName,Element_ID,ComplexType_JSON).
+
+
+
+/**
  * ##########  XS:ANNOTATION  ##########
  * ##########  XS:DOCUMENTATION  ##########
  */

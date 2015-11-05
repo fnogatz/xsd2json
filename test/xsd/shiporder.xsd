@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="shiporder">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="orderperson" type="xs:string" />
+      </xs:sequence>
+      <xs:attribute name="orderid" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
