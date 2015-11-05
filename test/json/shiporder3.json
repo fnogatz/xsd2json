@@ -1,0 +1,68 @@
+{
+  "properties": {
+    "orderid": {
+      "type": "string"
+    },
+    "orderperson": {
+      "type": "string"
+    },
+    "item": {
+      "type": "array",
+      "items": {
+        "required": [
+          "title",
+          "quantity",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "shipto": {
+      "required": [
+        "name",
+        "address",
+        "city",
+        "country"
+      ],
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "orderid",
+    "orderperson",
+    "item",
+    "shipto"
+  ],
+  "type": "object"
+}
