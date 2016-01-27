@@ -31,9 +31,11 @@ merge_json(json([Key=Value|Rest_JSON_List1]),json(JSON_List2),json(Merged),On_Co
       Value == Value2,
       New_Value = Value
     ;
-      % If `Key` is `description` simply concat the values
+      % If `Key` is `description` simply concat the string values
       %   by using a \n separator.
       Key == description,
+      atomic(Value),
+      atomic(Value2),
       string_concat(Value,'\n',ValueNl),
       string_concat(ValueNl,Value2,New_Value)
   ),

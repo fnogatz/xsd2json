@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "description": "Some Text."
+    }
+  },
+  "required": [ "description" ]
+}
