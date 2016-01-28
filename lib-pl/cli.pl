@@ -1,5 +1,3 @@
-#!/usr/bin/swipl -q -f
-
 :- use_module(xsd2json).
 :- use_module(library(http/json)).
 
@@ -54,16 +52,23 @@ main :-
   main(Opts,PositionalArgs).
 
 main(Opts,_PositionalArgs) :-
-  memberchk(help(true),Opts), !,
-  opts_spec(OptsSpec),
-  opt_help(OptsSpec,Help),
-  writeln(Help),
-  halt(0).
-
-main(Opts,_PositionalArgs) :-
   memberchk(version(true),Opts), !,
   xsd2json:version(Version),
   writeln(Version),
+  halt(0).
+
+main(Opts,PositionalArgs) :-
+  (
+    memberchk(help(true),Opts)
+  ;
+    PositionalArgs = []
+  ), !,
+  opts_spec(OptsSpec),
+  opt_help(OptsSpec,Help),
+  writeln('USAGE: xsd2json [options] <path>'), nl,
+  writeln('convert a XSD file into equivalent JSON schema'), nl,
+  writeln('Options:'),
+  writeln(Help),
   halt(0).
 
 main(Opts,PositionalArgs) :-
@@ -77,5 +82,7 @@ main(Opts,PositionalArgs) :-
     Trace = false
   ),
   xsd2json(Filename,Opts,JSON),
-  json_write(user_output,JSON), nl,
+  json_write(user_output,JSON,[step(2),width(200),tab(4)]), nl,
   halt(0).
+
+main(_,_) :- halt(1).
