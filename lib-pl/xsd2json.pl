@@ -1,9 +1,15 @@
-:- module(xsd2json, [ xsd2json/2, flatten_xsd/1 ]).
+:- module(xsd2json, [
+  xsd2json/2,
+  xsd2json/3,
+  flatten_xsd/1,
+  version/1
+]).
 :- use_module(merge_json).
 :- use_module(helpers).
 :- use_module(library(chr)).
 :- use_module(library(http/http_open)).
 :- use_module(library(url)).
+:- use_module(library(option)).
 
 
 /**
@@ -163,18 +169,18 @@ node_attribute(IName,ID,Key,_Value_Kept,source)
 
 
 /**
- * parse_options/1
- * parse_options(List_Of_Options)
+ * default_parse_options/1
+ * default_parse_options(List_Of_Options)
  * 
  * Define a `List_Of_Options` for parse a XSD file by use
  *   of the built-in `load_structure/3`.
  */
-parse_options([
+default_parse_options([
   % read in XML file with handling of namespaces in mind
   dialect(xmlns),
 
   % remove spaces before and after tags, ignore whitespace-only elements
-  space(remove),
+  space(preserve),
   
   % quiet namespace handling
   % if a node has a namespace (like `xs` in `xs:element`) which hasn't
@@ -187,9 +193,14 @@ parse_options([
 ]).
 
 
+parse_options(Opts,Parse_Options) :-
+  default_parse_options(Default_Parse_Options),
+  merge_options(Opts,Default_Parse_Options,Parse_Options).
+
+
 /**
- * load_xml/2
- * load_xml(Input,XSD)
+ * load_xml/3
+ * load_xml(Input,Opts,XSD)
  *
  * Load a XSD file specified by `Input` and return the
  *   DOM tree in `XSD`.
@@ -197,8 +208,8 @@ parse_options([
  * Examples:
  *   load_xsd(stream(user_input),XSD).  %% binds XSD to the DOM tree
  */
-load_xsd(Input,XSD) :- 
-  parse_options(Parse_Options),
+load_xsd(Input,Opts,XSD) :- 
+  parse_options(Opts,Parse_Options),
   (
       (
           string_concat('http://',_,Input)
@@ -238,8 +249,8 @@ flatten_xsd(Input) :-
  *   equivalent JSON Schema instance and bind the
  *   result on the `JSON` variable.
  */
-xsd2json(Input,Result) :- 
-  load_xsd(Input,XSD),
+xsd2json(Input,Options,Result) :-
+  load_xsd(Input,Options,XSD),
   root_id(Root_ID),
   input_name(Input,Input_Name),
   xsd_flatten_nodes(Input_Name,Root_ID,0,XSD,Children_IDs),
@@ -249,6 +260,9 @@ xsd2json(Input,Result) :-
   get_json(Input_Name,First_Element,JSON),
   cleanup_json(JSON,Result),
   xsd2json_result(Input_Name,Result).
+
+xsd2json(Input,Result) :-
+  xsd2json(Input,[],Result).
 
 
 /**
@@ -298,7 +312,8 @@ register_namespace(Namespace,URL,_Parser) :-
  *   namespace(element,_,element).
  */
 namespace(Name,Namespace,Name_Without_NS) :-
-  Name = Namespace:Name_Without_NS.
+  Name = Namespace:Name_Without_NS,
+  !.
 namespace(Name_String,Namespace,Name_Without_NS) :-
   atom(Name_String),
   term_to_atom(Name,Name_String),
@@ -660,6 +675,25 @@ first_id(ID) :-
  *   and `text_node/3` constraints.
  */
 xsd_flatten_nodes(_IName,_Base_ID,_Pos,[],[]).
+
+xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
+  % is an xs:documentation, so lax parsing
+  Node = element(Node_Type,Node_Attributes,Child_Nodes),
+  namespace(Node_Type,Namespace,Node_Type_Without_NS),
+  xsd_namespace(Namespace),
+  Node_Type_Without_NS = documentation,
+  !,
+  new_id(Base_ID,Pos,ID),
+  new_id(ID,0,Text_Node_ID),
+  % rebuild XML string
+  html_to_string(Child_Nodes,String),
+  node(IName,Namespace,Node_Type_Without_NS,ID,[Text_Node_ID],Base_ID),
+  text_node(IName,Text_Node_ID,String,ID),
+  % nevertheless flatten its attributes
+  xsd_flatten_attributes(IName,ID,Node_Attributes),
+  % flatten sibling nodes
+  Next_Pos is Pos+1,
+  xsd_flatten_nodes(IName,Base_ID,Next_Pos,Nodes,Sibling_IDs).
 
 xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
   Node = element(Node_Type,Node_Attributes,Child_Nodes),  %% is an XML node, no text

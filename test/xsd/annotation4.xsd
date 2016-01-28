@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<xs:schema>
+  <xs:element name="dog" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>
+        <p>Some</p>
+      </xs:documentation>
+    </xs:annotation>
+  </xs:element>
+</xs:schema>
