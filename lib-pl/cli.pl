@@ -15,6 +15,17 @@ opts_spec([
     ])
   ],
   [
+    opt(indentation),
+    type(integer),
+    default(2),
+    shortflags([ i ]),
+    longflags([ 'indentation' ]),
+    help([
+      'set indentation level',
+      'use 0 for single-line output'
+    ])
+  ],
+  [
     opt(trace),
     type(boolean),
     default(false),
@@ -82,7 +93,10 @@ main(Opts,PositionalArgs) :-
     Trace = false
   ),
   xsd2json(Filename,Opts,JSON),
-  json_write(user_output,JSON,[step(2),width(200),tab(4)]), nl,
+  % output
+  memberchk(indentation(Indentation),Opts),
+  json_write(user_output,JSON,[width(1),step(Indentation)]), nl,
+  % finished
   halt(0).
 
 main(_,_) :- halt(1).
