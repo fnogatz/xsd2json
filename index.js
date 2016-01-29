@@ -4,21 +4,7 @@ var childProcess = require('child_process')
 var concat = require('concat-stream')
 var path = require('path')
 
-// Prolog executable:
-var PROLOG = process.env.SWIPL || 'swipl'
-
-var SOURCE = {
-  // Compiled (qlf) Prolog file, created by `npm run-script create-qlf`:
-  COMPILED: {
-    exec: process.env.XSD2JSON || path.resolve(__dirname, 'lib-pl', 'cli'),
-    args: ['-x']
-  },
-  // Uncompiled Prolog file, for on-the-fly translations (e.g. for development purposes):
-  UNCOMPILED: {
-    exec: process.env.XSD2JSONPL || path.resolve(__dirname, 'lib-pl', 'cli.pl'),
-    args: ['-q', '-g', 'main', '-s']
-  }
-}
+var CLI = path.resolve(__dirname, 'lib-pl', 'cli')
 
 function xsd2json (filename, options, callback) {
   if (arguments.length === 1) {
@@ -33,22 +19,13 @@ function xsd2json (filename, options, callback) {
     }
   }
 
-  var exec
-  var spawnArgs
-  if (options.uncompiled || process.env.USEPL === 'uncompiled') {
-    exec = SOURCE.UNCOMPILED.exec
-    spawnArgs = SOURCE.UNCOMPILED.args
-  } else {
-    exec = SOURCE.COMPILED.exec
-    spawnArgs = SOURCE.COMPILED.args
+  var spawnArgs = []
+  for (var key in options) {
+    spawnArgs.push('--' + key + '=' + options[key])
   }
-  spawnArgs = spawnArgs.concat([exec, filename])
+  spawnArgs.push(filename)
 
-  if (options.trace) {
-    spawnArgs.push('trace')
-  }
-
-  var outputStream = childProcess.spawn(PROLOG, spawnArgs)
+  var outputStream = childProcess.spawn(CLI, spawnArgs)
 
   if (typeof callback !== 'function') {
     // no callback given --> return stream

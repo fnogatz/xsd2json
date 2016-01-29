@@ -3,9 +3,7 @@
   "version": "1.5.0",
   "description": "Translate an XML Schema into equivalent JSON Schema",
   "main": "index.js",
-  "bin": {
-    "xs2json": "./lib-pl/cli"
-  },
+  "bin": "./lib-pl/cli",
   "scripts": {
     "prepublish": "npm run create-qlf",
     "pretest": "npm run create-qlf",
