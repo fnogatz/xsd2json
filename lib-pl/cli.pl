@@ -34,7 +34,7 @@ opts_spec([
     help([
       'run with activated tracing'
     ])
-  ], /*
+  ],
   [
     opt(version),
     type(boolean),
@@ -44,7 +44,7 @@ opts_spec([
     help([
       'show xsd2json version information'
     ])
-  ], */
+  ],
   [
     opt(help),
     type(boolean),

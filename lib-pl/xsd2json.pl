@@ -12,6 +12,14 @@
 :- use_module(library(option)).
 
 
+version(Version) :-
+  predicate_property(version(_V),file(File)),
+  absolute_file_name('../package.json',Package,[relative_to(File)]),
+  open(Package,read,Stream),
+  json_read(Stream,json(PackageJSON)),
+  memberchk(version=Version,PackageJSON).
+
+
 /**
  * transform/1
  * [CHR-Constraint]
@@ -829,10 +837,6 @@ convert_xsd_type(anySimpleType,json(JSON)) :-
       json([type= null])
     ]
   ].
-
-
-
-
 
 
 /**
