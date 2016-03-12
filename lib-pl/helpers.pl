@@ -5,7 +5,7 @@
   sgml_to_string/2
 ]).
 :- meta_predicate markup_to_string(3, ?, ?).
-:- use_module(library(sgml)).
+:- use_module(library(sgml_write)).
 
 
 /**

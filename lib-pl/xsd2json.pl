@@ -10,6 +10,7 @@
 :- use_module(library(http/http_open)).
 :- use_module(library(url)).
 :- use_module(library(option)).
+:- use_module(library(sgml)).
 
 
 version(Version) :-
@@ -207,8 +208,8 @@ parse_options(Opts,Parse_Options) :-
 
 
 /**
- * load_xml/3
- * load_xml(Input,Opts,XSD)
+ * load_xsd/3
+ * load_xsd(Input,Opts,XSD)
  *
  * Load a XSD file specified by `Input` and return the
  *   DOM tree in `XSD`.
@@ -250,8 +251,8 @@ flatten_xsd(Input) :-
 
 
 /**
- * xsd2json/2
- * xsd2json(Input,JSON)
+ * xsd2json/3
+ * xsd2json(Input,Options,JSON)
  *
  * Convert a XSD file specified in `Input` to the
  *   equivalent JSON Schema instance and bind the
@@ -269,6 +270,10 @@ xsd2json(Input,Options,Result) :-
   cleanup_json(JSON,Result),
   xsd2json_result(Input_Name,Result).
 
+/**
+ * xsd2json/2
+ * xsd2json(Input,JSON)
+ */
 xsd2json(Input,Result) :-
   xsd2json(Input,[],Result).
 

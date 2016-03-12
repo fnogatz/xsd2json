@@ -84,7 +84,11 @@ main(Opts,PositionalArgs) :-
 
 main(Opts,PositionalArgs) :-
   memberchk(trace(Trace),Opts),
-  PositionalArgs = [Filename|_ArgvRest],
+  (
+    PositionalArgs = [Filename]
+  ;
+    PositionalArgs = [_CLI, Filename]
+  ),
   (
     Trace = true,
     chr_leash(none),
