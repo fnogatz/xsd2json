@@ -417,8 +417,16 @@
           "minItems": 0
         },
         "date": {
-          "type": "string",
-          "format": "date-time"
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "string",
+              "format": "date-time"
+            }
+          ]
         },
         "id": {
           "type": "string",
@@ -494,8 +502,16 @@
           "minItems": 0
         },
         "date": {
-          "type": "string",
-          "format": "date-time"
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date"
+            },
+            {
+              "type": "string",
+              "format": "date-time"
+            }
+          ]
         },
         "id": {
           "type": "string",
