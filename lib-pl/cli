@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "Please run"
+echo "  npm install"
+echo "first."
