@@ -201,10 +201,13 @@ default_parse_options([
   call(xmlns, register_namespace)
 ]).
 
+memberi(List,El) :-
+  member(El,List).
 
 parse_options(Opts,Parse_Options) :-
   default_parse_options(Default_Parse_Options),
-  merge_options(Opts,Default_Parse_Options,Parse_Options).
+  include(memberi([space(_)]),Opts,Opts_For_SGML),
+  merge_options(Opts_For_SGML,Default_Parse_Options,Parse_Options).
 
 
 /**
