@@ -82,5 +82,6 @@ markup_to_string(Writer,Options,Markup,String) :-
   call(Writer,In,Markup,Options),
   switch(S),
   open(File,read,Out),
-  read_string(Out,_Length,String),
+  read_stream_to_codes(Out,Codes),
+  string_codes(String,Codes),
   close(Out).  
