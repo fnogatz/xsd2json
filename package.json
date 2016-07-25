@@ -38,7 +38,7 @@
     "concat-stream": "^1.4.6"
   },
   "devDependencies": {
-    "async": "^1.4.2",
+    "async": "^2.0.1",
     "interpreted": "^0.6.0",
     "nomnom": "^1.8.0",
     "standard": "^7.0.0",
