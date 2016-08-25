@@ -41,7 +41,7 @@
     "async": "^2.0.1",
     "interpreted": "^0.7.0",
     "nomnom": "^1.8.0",
-    "standard": "^7.0.0",
+    "standard": "^8.0.0",
     "tap": "^6.1.0",
     "jayschema": "^0.3.1"
   }
