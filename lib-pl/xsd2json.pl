@@ -432,6 +432,7 @@ cast_by_json(JSON,I,O) :-
   is_list(JSON),
   merge_json:lookup(type,JSON,Type,_Rest),
   cast(Type,I,O).
+cast_by_json(_Other,I,I) :- !.
 
 
 /**
@@ -1596,8 +1597,86 @@ transform(IName),
     node(IName,NS1,ParentEl,ParentEl_ID,_ParentEl_Children,_ParentEl_Parent_ID),
     node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ParentEl_ID),
     node_attribute(IName,Attribute_ID,name,Attribute_Name,_),
+    node_attribute(IName,Attribute_ID,type,Type_With_NS,_)
+  ==>
+    (
+      ParentEl == complexType
+    ;
+      ParentEl == extension
+    ),
+    \+var(Type_With_NS),
+    xsd_namespaces([NS1,NS2]),
+    reference_type(Type_With_NS,json(Attribute_JSON)),
+    mark_attribute(Mark),
+    string_concat(Mark,Attribute_Name,Attribute_Name2)
+  |
+    JSON = [
+      type=object,
+      properties=json([
+        Attribute_Name2=json(Attribute_JSON)
+      ])
+    ],
+    (
+      ParentEl == complexType,
+      json(IName,ParentEl_ID,json(JSON))
+    ;
+      ParentEl == extension,
+      JSON_Extension = [facets= json(JSON)],
+      json(IName,ParentEl_ID,json(JSON_Extension))
+    ).
+
+transform(IName),
+    node(IName,NS1,ParentEl,ParentEl_ID,_ParentEl_Children,_ParentEl_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ParentEl_ID),
+    node_attribute(IName,Attribute_ID,name,Attribute_Name,_),
     node_attribute(IName,Attribute_ID,type,Type_With_NS,_),
-    node_attribute(IName,Attribute_ID,use,Use,_),
+    node_attribute(IName,Attribute_ID,use,required,_)
+  ==>
+    (
+      ParentEl == complexType
+    ;
+      ParentEl == extension
+    ),
+    \+var(Type_With_NS),
+    xsd_namespaces([NS1,NS2])
+  |
+    json(IName,ParentEl_ID,json([
+      required= [Attribute_Name]
+    ])).
+
+transform(IName),
+    node(IName,NS1,ParentEl,ParentEl_ID,_ParentEl_Children,_ParentEl_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ParentEl_ID),
+    node_attribute(IName,Attribute_ID,name,Attribute_Name,_),
+    node_attribute(IName,Attribute_ID,type,Type_With_NS,_),
+    node_attribute(IName,Attribute_ID,fixed,Fixed,_)
+  ==>
+    (
+      ParentEl == complexType
+    ;
+      ParentEl == extension
+    ),
+    \+var(Type_With_NS),
+    xsd_namespaces([NS1,NS2]),
+    reference_type(Type_With_NS,json(Attribute_JSON)),
+    \+var(Fixed),
+    mark_attribute(Mark),
+    string_concat(Mark,Attribute_Name,Attribute_Name2)
+  |
+    cast_by_json(Attribute_JSON,Fixed,Fixed_Casted),
+    json(IName,ParentEl_ID,json([
+      properties=json([
+        Attribute_Name2=json([
+          enum=[Fixed_Casted]
+        ])
+      ])
+    ])).
+
+transform(IName),
+    node(IName,NS1,ParentEl,ParentEl_ID,_ParentEl_Children,_ParentEl_Parent_ID),
+    node(IName,NS2,attribute,Attribute_ID,_Attribute_Children,ParentEl_ID),
+    node_attribute(IName,Attribute_ID,name,Attribute_Name,_),
+    node_attribute(IName,Attribute_ID,type,Type_With_NS,_),
     node_attribute(IName,Attribute_ID,fixed,Fixed,_),
     node_attribute(IName,Attribute_ID,default,Default,_)
   ==>
@@ -1608,56 +1687,24 @@ transform(IName),
     ),
     \+var(Type_With_NS),
     xsd_namespaces([NS1,NS2]),
-    reference_type(Type_With_NS,json(Attribute_JSON))
-  |
-    % check `fixed` entity
-    (
-        var(Fixed),
-        Attribute_JSON2 = Attribute_JSON
-      ;
-        \+var(Fixed),
-        cast_by_json(Attribute_JSON,Fixed,Fixed_Casted),
-        Attribute_JSON2 = [enum=[Fixed_Casted]|Attribute_JSON]
-    ),
-    % check `default` entity
-    (
-        var(Default),
-        Attribute_JSON3 = Attribute_JSON2
-      ;
-        /**
-         * As mentioned in the XSD specification not both
-         *   `fixed` and `enum` can be set.
-         */
-        \+var(Default),
-        var(Fixed),      % see explanation above
-        cast_by_json(Attribute_JSON2,Default,Default_Casted),
-        Attribute_JSON3 = [default=Default_Casted|Attribute_JSON2]
-    ),
-    % generate JSON
+    reference_type(Type_With_NS,json(Attribute_JSON)),
+    /**
+     * As mentioned in the XSD specification not both
+     *   `fixed` and `enum` can be set.
+     */
+    \+var(Default),
+    var(Fixed),      % see explanation above
     mark_attribute(Mark),
-    string_concat(Mark,Attribute_Name,Attribute_Name2),
-    JSON1 = [
-      type=object,
+    string_concat(Mark,Attribute_Name,Attribute_Name2)
+  |
+    cast_by_json(Attribute_JSON,Default,Default_Casted),
+    json(IName,ParentEl_ID,json([
       properties=json([
-        Attribute_Name2=json(Attribute_JSON3)
+        Attribute_Name2=json([
+          default=Default_Casted
+        ])
       ])
-    ],
-    % check `required` entity
-    (
-        Use == required,
-        JSON2 = [required=[Attribute_Name]|JSON1]
-      ;
-        Use \= required,
-        JSON2 = JSON1
-    ),
-    (
-      ParentEl == complexType,
-      json(IName,ParentEl_ID,json(JSON2))
-    ;
-      ParentEl == extension,
-      JSON_Extension = [facets= json(JSON2)],
-      json(IName,ParentEl_ID,json(JSON_Extension))
-    ).
+    ])).
 
 
 /**
