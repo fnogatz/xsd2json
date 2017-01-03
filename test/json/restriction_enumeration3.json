@@ -1,0 +1,11 @@
+{
+  "definitions": {
+    "yesno": {
+      "type": "string",
+      "enum": [
+        "yes",
+        "no"
+      ]
+    }
+  }
+}

@@ -1,5 +1,9 @@
 {
-  "$ref": "#/definitions/Pets",
+  "allOf": [
+    {
+      "$ref": "#/definitions/Pets"
+    }
+  ],
   "definitions": {
     "Pets": {
       "type": "string",

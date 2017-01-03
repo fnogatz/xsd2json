@@ -10,5 +10,9 @@
       }
     }
   },
-  "$ref": "#/definitions/recursive"
+  "allOf": [
+    {
+      "$ref": "#/definitions/recursive"
+    }
+  ]
 }

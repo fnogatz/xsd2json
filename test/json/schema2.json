@@ -1,5 +1,9 @@
 {
-  "$ref": "#/definitions/myType",
+  "allOf": [
+    {
+      "$ref": "#/definitions/myType"
+    }
+  ],
   "definitions": {
     "myType": {
       "type": "string",

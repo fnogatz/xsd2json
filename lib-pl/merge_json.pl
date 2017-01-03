@@ -22,7 +22,29 @@ merge_json(JSON1,JSON2,Merged,hard) :- merge_json(JSON1,JSON2,Merged,0).
 
 merge_json(JSON1,JSON2,_Merged,_On_Conflict) :- (var(JSON1); var(JSON2)), !, false.
 
-merge_json(json([]),json(JSON_List2),json(JSON_List2),_On_Conflict).
+merge_json(json([]),json(JSON_List2),json(JSON_List2),_On_Conflict) :- !.
+merge_json(json(JSON_List1),json([]),json(JSON_List1),_On_Conflict) :- !.
+
+merge_json(json(['$ref'=Ref]),json(JSON_List2),json(Merged),On_Conflict) :-
+  % Avoid combining "$ref" with other properties (c.f. http://json-schema.org/latest/json-schema-core.html#rfc.section.7)
+  AllOf = json([
+    allOf= [
+      json([
+        '$ref'= Ref
+      ])
+    ]
+  ]),
+  merge_json(AllOf,json(JSON_List2),json(Merged),On_Conflict).
+merge_json(json(JSON_List1),json(['$ref'=Ref]),json(Merged),On_Conflict) :-
+  % Avoid combining "$ref" with other properties (c.f. http://json-schema.org/latest/json-schema-core.html#rfc.section.7)
+  AllOf = json([
+    allOf= [
+      json([
+        '$ref'= Ref
+      ])
+    ]
+  ]),
+  merge_json(json(JSON_List1),AllOf,json(Merged),On_Conflict).
 
 merge_json(json([Key=Value|Rest_JSON_List1]),json(JSON_List2),json(Merged),On_Conflict) :-
   % Key also exists in JSON_List2
