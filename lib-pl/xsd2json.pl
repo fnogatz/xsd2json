@@ -332,8 +332,9 @@ namespace(Name,Namespace,Name_Without_NS) :-
   !.
 namespace(Name_String,Namespace,Name_Without_NS) :-
   atom(Name_String),
-  term_to_atom(Name,Name_String),
-  Name = Namespace:Name_Without_NS.
+  split_string(Name_String,':','',[Namespace_Str, Name_Without_NS_Str]),
+  atom_string(Namespace,Namespace_Str),
+  atom_string(Name_Without_NS,Name_Without_NS_Str).
 % no namespace present
 namespace(Name,_,Name_Term) :-
   \+atom(Name),
@@ -830,6 +831,7 @@ convert_xsd_type(short,json([type= integer])).
 convert_xsd_type(string,json([type= string])).
 convert_xsd_type(time,json([type= string,format= 'date-time'])).
 convert_xsd_type(token,json([type= string])).
+convert_xsd_type('NMTOKEN',json([type= string])).
 convert_xsd_type(unsignedByte,json([type= integer,minimum= 0, exclusiveMinimum= @(false), maximum= 255,exclusiveMaximum= @(false)])).
 convert_xsd_type(unsignedLong,json([type= integer,minimum= 0, exclusiveMinimum= @(false)])).
 convert_xsd_type(unsignedInt,json([type= integer,minimum= 0, exclusiveMinimum= @(false)])).
