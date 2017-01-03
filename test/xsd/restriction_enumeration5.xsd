@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <xs:schema>
-  <xs:element name="dog" type="yesno" />
+  <xs:element name="dog" type="yesno" fixed="yes" />
 
   <xs:simpleType name="yesno">
     <xs:restriction base="xs:string">

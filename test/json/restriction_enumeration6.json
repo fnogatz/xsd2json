@@ -1,0 +1,24 @@
+{
+  "definitions": {
+    "yesno": {
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "type":"string"
+    },
+    "dog": {
+      "properties": {
+        "animal": {
+          "allOf": [
+            {
+              "$ref":"#/definitions/yesno"
+            }
+          ],
+          "enum": [ "yes" ]
+        }
+      },
+      "type":"object"
+    }
+  }
+}

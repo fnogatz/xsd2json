@@ -1,6 +1,8 @@
 <?xml version="1.0" ?>
 <xs:schema>
-  <xs:element name="dog" type="yesno" />
+  <xs:complexType name="dog">
+    <xs:attribute name="animal" type="yesno" fixed="yes" />
+  </xs:complexType>
 
   <xs:simpleType name="yesno">
     <xs:restriction base="xs:string">
