@@ -1,0 +1,10 @@
+<xs:schema>
+  <xs:simpleType name="Pets">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="cat" />
+      <xs:enumeration value="dog" />
+      <xs:enumeration value="parrot" />
+      <xs:enumeration value="hamster" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

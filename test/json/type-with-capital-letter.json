@@ -1,0 +1,13 @@
+{
+  "definitions": {
+    "Pets": {
+      "type": "string",
+      "enum": [
+        "cat",
+        "dog",
+        "parrot",
+        "hamster"
+      ]
+    }
+  }
+}
