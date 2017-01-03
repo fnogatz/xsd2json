@@ -332,9 +332,7 @@ namespace(Name,Namespace,Name_Without_NS) :-
   !.
 namespace(Name_String,Namespace,Name_Without_NS) :-
   atom(Name_String),
-  split_string(Name_String,':','',[Namespace_Str, Name_Without_NS_Str]),
-  atom_string(Namespace,Namespace_Str),
-  atom_string(Name_Without_NS,Name_Without_NS_Str).
+  atomic_list_concat([Namespace,Name_Without_NS],':',Name_String).
 % no namespace present
 namespace(Name,_,Name_Term) :-
   \+atom(Name),
