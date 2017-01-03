@@ -831,6 +831,8 @@ convert_xsd_type(string,json([type= string])).
 convert_xsd_type(time,json([type= string,format= 'date-time'])).
 convert_xsd_type(token,json([type= string])).
 convert_xsd_type('NMTOKEN',json([type= string])).
+convert_xsd_type('ID',json([type= string])).
+convert_xsd_type('IDREF',json([type= string])).
 convert_xsd_type(unsignedByte,json([type= integer,minimum= 0, exclusiveMinimum= @(false), maximum= 255,exclusiveMaximum= @(false)])).
 convert_xsd_type(unsignedLong,json([type= integer,minimum= 0, exclusiveMinimum= @(false)])).
 convert_xsd_type(unsignedInt,json([type= integer,minimum= 0, exclusiveMinimum= @(false)])).
