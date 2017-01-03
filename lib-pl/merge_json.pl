@@ -74,15 +74,14 @@ merge_json(json([Key=Value|Rest_JSON_List1]),json(JSON_List2),json(Merged),On_Co
       %   in an append of both lists.
       % This might be necessary due to different orders to
       %  apply the CHR rules.
-      (Key == required; Key == enum), 
+      (Key == required; Key == enum),
+      !,
       union(Value,Value_in_JSON_List2,Merged_Value)
     ;
       Key == facets,
+      !,
       merge_facets(Value,Value_in_JSON_List2,Merged_Value)
     ;
-      Key \== required, 
-      Key \== enum,
-      Key \== facets,
       merge_json(Value,Value_in_JSON_List2,Merged_Value)
   ),
   % merge the rest of the lists independently of the
