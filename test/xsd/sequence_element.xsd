@@ -1,7 +1,7 @@
 <xs:schema>
-	<xs:complexType name="pets">
-		<xs:sequence>
-		  <xs:element name="dog" type="xs:string" minOccurs="0" maxOccurs="1" />
-		</xs:sequence>
-	</xs:complexType>
+  <xs:complexType name="pets">
+    <xs:sequence>
+      <xs:element name="dog" type="xs:string" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+  </xs:complexType>
 </xs:schema>

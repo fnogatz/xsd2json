@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <xs:schema>
   <xs:simpleType name="dog">
-  	<xs:restriction base="xs:string">
+    <xs:restriction base="xs:string">
       <xs:minLength value="10" />
     </xs:restriction>
   </xs:simpleType>
