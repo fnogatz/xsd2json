@@ -2029,14 +2029,58 @@ transform(IName_Parent),
 /**
  * ##########  XS:SCHEMA  ##########
  */
+
+:- chr_constraint single_root_element/2.
+:- chr_constraint multiple_root_elements/1.
+
+node(IName,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    node(IName,NS2,element,Element_ID,_Element_Children,Schema_ID)
+  ==>
+    xsd_namespaces([NS1,NS2])
+  |
+    single_root_element(IName,Element_ID).
+
+single_root_element(IName,_),
+    single_root_element(IName,_)
+  <=> multiple_root_elements(IName).
+
+multiple_root_elements(IName) \
+    single_root_element(IName,_)
+  <=>
+    true.
+
 transform(IName),
     node(IName,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    single_root_element(IName,Element_ID),
     node(IName,NS2,element,Element_ID,_Element_Children,Schema_ID),
     json(IName,Element_ID,Element_JSON)
   ==>
     xsd_namespaces([NS1,NS2])
   |
     json(IName,Schema_ID,Element_JSON).
+
+transform(IName),
+    node(IName,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
+    multiple_root_elements(IName),
+    node(IName,NS2,element,Element_ID,_Element_Children,Schema_ID),
+    node_attribute(IName,Element_ID,name,Element_Name,_),
+    json(IName,Element_ID,Element_JSON)
+  ==>
+    xsd_namespaces([NS1,NS2])
+  |
+    json(IName,Schema_ID,json([
+      oneOf= [
+        json([
+          type= object,
+          properties= json([
+            Element_Name=Element_JSON
+          ]),
+          additionalProperties= @(false),
+          required= [Element_Name]
+        ])
+      ]
+    ])).
+
 
 
 /**

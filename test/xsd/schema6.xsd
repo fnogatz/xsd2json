@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<xs:schema>
+  <xs:element name="dog" type="xs:string" />
+  <xs:element name="cat" type="xs:string" />
+</xs:schema>

@@ -1,0 +1,24 @@
+{
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "dog": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [ "dog" ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "cat": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [ "cat" ]
+    }
+  ]
+}
