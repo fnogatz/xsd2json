@@ -1200,6 +1200,19 @@ transform(IName),
     ],
     json(IName,Extension_ID,json(JSON)).
 
+transform(IName),
+    node(IName,NS1,simpleContent,SimpleContent_ID,_SimpleContent_Children,_SimpleContent_Parent_ID),
+    node(IName,NS2,extension,Extension_ID,_Extension_Children,SimpleContent_ID),
+    node_attribute(IName,Extension_ID,base,Base,_)
+  ==>
+    xsd_namespaces([NS1,NS2]),
+    reference_type(Base,json(Base_JSON))
+  |
+    json(IName,Extension_ID,json([
+      facets= json([]),
+      base= json(Base_JSON)
+    ])).
+
 
 /**
  * ##########  XS:RESTRICTION  ##########
@@ -1580,6 +1593,32 @@ transform(IName),
     xsd_namespaces([NS1,NS2,NS3])
   |
     json(IName,ComplexType_ID,Extension_JSON).
+
+
+/**
+ * `xs:complexType` which has `xs:simpleContent/xs:extension` children.
+ */
+transform(IName),
+    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
+    node(IName,NS2,simpleContent,SimpleContent_ID,_SimpleContent_Children,ComplexType_ID),
+    node(IName,NS3,extension,Extension_ID,_Extension_Children,SimpleContent_ID),
+    json(IName,Extension_ID,json(Extension_JSON_List))
+  ==>
+    xsd_namespaces([NS1,NS2,NS3]),
+    lookup(base,Extension_JSON_List,json(Base),Extension_JSON_List_Wo_Base),
+    lookup(facets,Extension_JSON_List_Wo_Base,json(Facets)),
+    lookup(properties,Facets,Facets_Properties)
+  |
+    json(IName,ComplexType_ID,json([
+      type= object,
+      properties=json([
+        value= json(Base)
+      ]),
+      required= [value]
+    ])),
+    json(IName,ComplexType_ID,json([
+      properties=Facets_Properties
+    ])).
 
 
 /**
