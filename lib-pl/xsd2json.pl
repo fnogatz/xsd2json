@@ -1379,18 +1379,19 @@ transform(IName),
 
 
 /**
- * Nested `xs:element/xs:complexType` structure with `name`
+ * Nested `xs:element/{xs:complexType,xs:simpleType}` structure with `name`
  *   attribute set.
  */
 transform(IName),
     node(IName,NS1,element,Element_ID,_Element_Children,_Element_Parent_ID),
-    node(IName,NS2,complexType,ComplexType_ID,_ComplexType_Children,Element_ID),
-    node_attribute(IName,Element_ID,name,Name,_),
-    json(IName,ComplexType_ID,ComplexType_JSON)
+    node(IName,NS2,InnerType,InnerType_ID,_InnerType_Children,Element_ID),
+    node_attribute(IName,Element_ID,name,_Name,_),
+    json(IName,InnerType_ID,InnerType_JSON)
   ==>
-    xsd_namespaces([NS1,NS2])
+    xsd_namespaces([NS1,NS2]),
+    member(InnerType,[complexType,simpleType])
   |
-    json(IName,Element_ID,ComplexType_JSON).
+    json(IName,Element_ID,InnerType_JSON).
 
 
 
@@ -2036,34 +2037,6 @@ transform(IName),
     xsd_namespaces([NS1,NS2])
   |
     json(IName,Schema_ID,Element_JSON).
-
-
-/**
- * Nested `xs:schema/xs:element/xs:simpleType` structure.
- */
-transform(IName),
-    node(IName,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
-    node(IName,NS2,element,Element_ID,_Element_Children,Schema_ID),
-    node(IName,NS3,simpleType,SimpleType_ID,_SimpleType_Children,Element_ID),
-    json(IName,SimpleType_ID,SimpleType_JSON)
-  ==>
-    xsd_namespaces([NS1,NS2,NS3])
-  |
-    json(IName,Schema_ID,SimpleType_JSON).
-
-
-/**
- * Nested `xs:schema/xs:element/xs:complexType` structure.
- */
-transform(IName),
-    node(IName,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
-    node(IName,NS2,element,Element_ID,_Element_Children,Schema_ID),
-    node(IName,NS3,complexType,ComplexType_ID,_ComplexType_Children,Element_ID),
-    json(IName,ComplexType_ID,ComplexType_JSON)
-  ==>
-    xsd_namespaces([NS1,NS2,NS3])
-  |
-    json(IName,Schema_ID,ComplexType_JSON).
 
 
 /**
