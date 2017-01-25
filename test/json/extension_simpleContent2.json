@@ -1,0 +1,16 @@
+{
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "@value": {
+          "type": "integer"
+        }
+      },
+      "required": ["value"]
+    }
+  }
+}

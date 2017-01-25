@@ -1606,7 +1606,7 @@ transform(IName),
   ==>
     xsd_namespaces([NS1,NS2,NS3]),
     lookup(base,Extension_JSON_List,json(Base),Extension_JSON_List_Wo_Base),
-    lookup(facets,Extension_JSON_List_Wo_Base,json(Facets)),
+    lookup(facets,Extension_JSON_List_Wo_Base,json(Facets),Extension_JSON_List_Wo_Base_Facets),
     lookup(properties,Facets,Facets_Properties)
   |
     json(IName,ComplexType_ID,json([
@@ -1618,7 +1618,8 @@ transform(IName),
     ])),
     json(IName,ComplexType_ID,json([
       properties=Facets_Properties
-    ])).
+    ])),
+    json(IName,ComplexType_ID,json(Extension_JSON_List_Wo_Base_Facets)).
 
 
 /**
