@@ -2,7 +2,9 @@
   string_concat/2,
   html_to_string/2,
   xml_to_string/2,
-  sgml_to_string/2
+  sgml_to_string/2,
+  lookup/4,
+  lookup/3
 ]).
 :- meta_predicate markup_to_string(3, ?, ?).
 :- use_module(library(sgml_write)).
@@ -85,3 +87,34 @@ markup_to_string(Writer,Options,Markup,String) :-
   read_stream_to_codes(Out,Codes),
   string_to_list(String,Codes),
   close(Out).  
+
+/**
+ * lookup/3
+ * lookup(Key,Key_Value_List,Value)
+ * 
+ * Predicate to search for a Key in a Key-Value-List.
+ *
+ * Examples:
+ *   lookup(key,[key=value,key2=value2],value).
+ *   lookup(key2,[key=value,key2=value2],Value2).  %% Value2 = value2.
+ *   \+(lookup(key,[],Value)).
+ */
+lookup(Key,Store,Value) :- 
+  lookup(Key,Store,Value,_).
+
+
+/**
+ * lookup/4
+ * lookup(Key,Key_Value_List,Value,List_Without_This_Pair)
+ * 
+ * Search for a given Key in a Key-Value-List and return
+ * the List without this pair.
+ *
+ * Examples:
+ *   lookup(key,[key=value,key2=value2],value,[key2=value2]).
+ *   lookup(key,[key=value],Value,Rest).  %% Value = value, Rest = [].
+ */
+lookup(Key,[Key=Value|Without_Key],Value,Without_Key).
+lookup(Key,[Not_Key=Some_Value|Rest],Value,[Not_Key=Some_Value|Without_Key]) :- 
+  Key \= Not_Key, 
+  lookup(Key,Rest,Value,Without_Key).

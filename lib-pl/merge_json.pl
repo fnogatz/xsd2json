@@ -1,4 +1,4 @@
-:- module(merge_json, [ merge_json/3, merge_json/4, merge_facets/3, merge_facet/4, lookup/4 ]).
+:- module(merge_json, [ merge_json/3, merge_json/4, merge_facets/3, merge_facet/4 ]).
 :- use_module(helpers).
 
 
@@ -153,35 +153,3 @@ merge_facet(minimum,A,B,B) :- A < B.
 merge_facet(maximum,A,B,A) :- A =< B.
 merge_facet(maximum,A,B,B) :- A > B.
 merge_facet(pattern,A,B,R) :- string_concat(['(',A,'|',B,')'],R).
-
-
-/**
- * lookup/3
- * lookup(Key,Key_Value_List,Value)
- * 
- * Predicate to search for a Key in a Key-Value-List.
- *
- * Examples:
- *   lookup(key,[key=value,key2=value2],value).
- *   lookup(key2,[key=value,key2=value2],Value2).  %% Value2 = value2.
- *   \+(lookup(key,[],Value)).
- */
-lookup(Key,Store,Value) :- 
-  lookup(Key,Store,Value,_).
-
-
-/**
- * lookup/4
- * lookup(Key,Key_Value_List,Value,List_Without_This_Pair)
- * 
- * Search for a given Key in a Key-Value-List and return
- * the List without this pair.
- *
- * Examples:
- *   lookup(key,[key=value,key2=value2],value,[key2=value2]).
- *   lookup(key,[key=value],Value,Rest).  %% Value = value, Rest = [].
- */
-lookup(Key,[Key=Value|Without_Key],Value,Without_Key).
-lookup(Key,[Not_Key=Some_Value|Rest],Value,[Not_Key=Some_Value|Without_Key]) :- 
-  Key \= Not_Key, 
-  lookup(Key,Rest,Value,Without_Key).
