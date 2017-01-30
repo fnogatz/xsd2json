@@ -167,17 +167,6 @@ node_attribute(IName,ID,Key,_Value_Kept,source)
 
 
 /**
- * namespace_uri/2
- * namespace_uri(Namespace,URI)
- * [dynamic Prolog]
- *
- * Hold the `URI` of a `Namespace`. Will be set dynamically by
- *   `register_namespace/3`.
- */
-:- dynamic namespace_uri/2.
-
-
-/**
  * default_parse_options/1
  * default_parse_options(List_Of_Options)
  *
@@ -197,8 +186,8 @@ default_parse_options([
   %   error message
   xml_no_ns(quiet),
 
-  % create a new `namespace/2` constraint for each namespace
-  call(xmlns, register_namespace)
+  % pass namespace as `ns(Prefix, URI)`
+  keep_prefix(true)
 ]).
 
 memberi(List,El) :-
@@ -295,27 +284,6 @@ input_name(Filepath,Abs_Filepath) :-
 
 
 /**
- * register_namespace/3
- * register_namespace(+NameSpace, +URL, +Parser)
- *
- * Predicate being called when a Prolog's built-in
- *   `load_structure/3` is called with the option
- *   `call(xmlns, register_namespace)` was set.
- * Creates a new `namespace/2` CHR constraint for
- *   each namespace in the XSD.
- */
-
-% Namespace without URL --> must be default XSD Namespace
-register_namespace(Namespace,Namespace,_Parser) :-
-  asserta(namespace_uri(Namespace,'http://www.w3.org/2001/XMLSchema')).
-
-% Namespace and URL given
-register_namespace(Namespace,URL,_Parser) :-
-  Namespace \== URL,
-  asserta(namespace_uri(Namespace,URL)).
-
-
-/**
  * namespace/3
  * namespace(Name,Namespace,Name_Without_Namespace)
  *
@@ -339,6 +307,9 @@ namespace(Name,_,Name_Term) :-
   term_to_atom(Name_Term,Name).
 
 
+xsd_namespace_uri('http://www.w3.org/2001/XMLSchema').
+
+
 /**
  * xsd_namespace/1
  * xsd_namespace(Namespace)
@@ -346,9 +317,8 @@ namespace(Name,_,Name_Term) :-
  * Predicate which holds the standard namespaces for
  *   XML Schema instances.
  */
-xsd_namespace('http://www.w3.org/2001/XMLSchema').
-xsd_namespace(Namespace) :-
-  namespace_uri(Namespace,'http://www.w3.org/2001/XMLSchema').
+xsd_namespace(ns(_,URI)) :-
+  xsd_namespace_uri(URI).
 
 
 /**
