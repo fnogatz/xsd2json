@@ -225,21 +225,37 @@ load_xsd(Input,Opts,XSD) :-
 
 
 /**
- * flatten_xsd/1
- * flatten_xsd(Input)
+ * flatten_xsd/2
+ * flatten_xsd(Input,Options)
  *
  * Load a XSD file specified by `Input` and flatten
  *   its DOM tree. This will result in multple `node/5`
  *   and `text_node/2` constraints.
  *
  * Examples:
+ *   flatten_xsd(stream(user_input),[]).
+ */
+flatten_xsd(Input,Options) :-
+  load_xsd(Input,Options,XSD),
+  root_id(Root_ID),
+  input_name(Input,Input_Name),
+  Namespaces = [],
+  xsd_flatten_nodes(Input_Name,Root_ID,0,XSD,Namespaces,_Children_IDs).
+
+
+/**
+ * flatten_xsd/1
+ * flatten_xsd(Input)
+ *
+ * Load a XSD file specified by `Input` using
+ *   no special options.
+ *
+ * Examples:
  *   flatten_xsd(stream(user_input)).
  */
 flatten_xsd(Input) :-
-  load_xsd(Input,XSD),
-  root_id(Root_ID),
-  input_name(Input,Input_Name),
-  xsd_flatten_nodes(Input_Name,Root_ID,0,XSD,_Children_IDs).
+  Options = [],
+  flatten_xsd(Input,Options).
 
 
 /**
@@ -254,13 +270,15 @@ xsd2json(Input,Options,Result) :-
   load_xsd(Input,Options,XSD),
   root_id(Root_ID),
   input_name(Input,Input_Name),
-  xsd_flatten_nodes(Input_Name,Root_ID,0,XSD,Children_IDs),
+  Namespaces = [],
+  xsd_flatten_nodes(Input_Name,Root_ID,0,XSD,Namespaces,Children_IDs),
   transform(Input_Name),
   Children_IDs = [First_Element|_],
   build_schema(Input_Name),
   get_json(Input_Name,First_Element,JSON),
   cleanup_json(JSON,Result),
   xsd2json_result(Input_Name,Result).
+
 
 /**
  * xsd2json/2
@@ -302,8 +320,7 @@ namespace(Name_String,Namespace,Name_Without_NS) :-
   atom(Name_String),
   atomic_list_concat([Namespace,Name_Without_NS],':',Name_String).
 % no namespace present
-namespace(Name,_,Name_Term) :-
-  \+atom(Name),
+namespace(Name,'',Name_Term) :-
   term_to_atom(Name_Term,Name).
 
 
@@ -336,6 +353,15 @@ xsd_namespaces([]).
 xsd_namespaces([Namespace|Namespaces]) :-
   xsd_namespace(Namespace),
   xsd_namespaces(Namespaces).
+
+
+no_xsd_namespace(Type_With_NS) :-
+  (
+    Type_With_NS = ns('',URI):_Type,
+    \+xsd_namespace_uri(URI)
+  ;
+    atom(Type_With_NS)
+  ).
 
 
 /**
@@ -654,15 +680,15 @@ first_id(ID) :-
 
 
 /**
- * xsd_flatten_nodes/5
+ * xsd_flatten_nodes/6
  *
  * Flatten a XSD DOM tree by creating `node/5`,
  *   `attribute/`
  *   and `text_node/3` constraints.
  */
-xsd_flatten_nodes(_IName,_Base_ID,_Pos,[],[]).
+xsd_flatten_nodes(_IName,_Base_ID,_Pos,[],_Namespaces,[]).
 
-xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
+xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],Namespaces,[ID|Sibling_IDs]) :-
   % is an xs:documentation, so lax parsing
   Node = element(Node_Type,Node_Attributes,Child_Nodes),
   namespace(Node_Type,Namespace,Node_Type_Without_NS),
@@ -676,49 +702,103 @@ xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
   node(IName,Namespace,Node_Type_Without_NS,ID,[Text_Node_ID],Base_ID),
   text_node(IName,Text_Node_ID,String,ID),
   % nevertheless flatten its attributes
-  xsd_flatten_attributes(IName,ID,Node_Attributes),
+  xsd_flatten_attributes(IName,ID,Node_Attributes,Namespaces),
   % flatten sibling nodes
   Next_Pos is Pos+1,
-  xsd_flatten_nodes(IName,Base_ID,Next_Pos,Nodes,Sibling_IDs).
+  xsd_flatten_nodes(IName,Base_ID,Next_Pos,Nodes,Namespaces,Sibling_IDs).
 
-xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
+xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],Namespaces,[ID|Sibling_IDs]) :-
   Node = element(Node_Type,Node_Attributes,Child_Nodes),  %% is an XML node, no text
   new_id(Base_ID,Pos,ID),
   namespace(Node_Type,Namespace,Node_Type_Without_NS),
+  % check for defined xmlns namespaces
+  get_defined_namespaces(Node_Attributes,Defined_Namespaces),
+  merge_namespaces(Namespaces,Defined_Namespaces,Merged_Namespaces),
   % flatten the node's attributes
-  xsd_flatten_attributes(IName,ID,Node_Attributes),
+  xsd_flatten_attributes(IName,ID,Node_Attributes,Merged_Namespaces),
+  % set this node
   node(IName,Namespace,Node_Type_Without_NS,ID,Children_IDs,Base_ID),
   % flatten sibling nodes
   Next_Pos is Pos+1,
-  xsd_flatten_nodes(IName,Base_ID,Next_Pos,Nodes,Sibling_IDs),
+  xsd_flatten_nodes(IName,Base_ID,Next_Pos,Nodes,Namespaces,Sibling_IDs),
   % flatten all children
-  xsd_flatten_nodes(IName,ID,0,Child_Nodes,Children_IDs).
+  xsd_flatten_nodes(IName,ID,0,Child_Nodes,Merged_Namespaces,Children_IDs).
 
-xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],[ID|Sibling_IDs]) :-
+xsd_flatten_nodes(IName,Base_ID,Pos,[Node|Nodes],Namespaces,[ID|Sibling_IDs]) :-
   atom(Node),  %% is simply a text node
   new_id(Base_ID,Pos,ID),
   text_node(IName,ID,Node,Base_ID),
   % flatten sibling nodes
   Next_Pos is Pos+1,
-  xsd_flatten_nodes(IName,Base_ID,Next_Pos,Nodes,Sibling_IDs).
+  xsd_flatten_nodes(IName,Base_ID,Next_Pos,Nodes,Namespaces,Sibling_IDs).
 
 
 /**
- * xsd_flatten_attributes/3
- * xsd_flatten_attributes(IName,ID,List_Of_Attributes)
+ * xsd_flatten_attributes/4
+ * xsd_flatten_attributes(IName,ID,List_Of_Attributes,Namespaces)
  *
  * Flatten a `List_Of_Attributes` of the form
  *   [attribute1=value1,attribute2=value2,...]
  *   by creating `node_attribute/4` constraints.
+ * For @type attributes in the given XSD-Namespaces it adds
+ *   the namespace as `ns(Prefix,URI):` prefix.
  *
  * Examples:
- *   xsd_flatten_attributes('file.xsd',[0],[minOccurs='1'])
+ *   xsd_flatten_attributes('file.xsd',[0],[minOccurs='1'],[])
  *     ==> node_attribute('file.xsd',[0],minOccurs,'1')
+ *   xsd_flatten_attributes('file.xsd',[0],[type=string],[ns('','http://www.w3.org/2001/XMLSchema')])
+ *     ==> node_attribute('file.xsd',[0],type,ns('','http://www.w3.org/2001/XMLSchema'):string)
  */
-xsd_flatten_attributes(_IName,_ID,[]).
-xsd_flatten_attributes(IName,ID,[Attribute=Value|List_Of_Attributes]) :-
+xsd_flatten_attributes(_IName,_ID,[],_Namespaces).
+xsd_flatten_attributes(IName,ID,[Attribute=Value|List_Of_Attributes],Namespaces) :-
+  member(Attribute,[type,base]),
+  namespace(Value,Prefix,Type),
+  member(ns(Prefix,URI),Namespaces),
+  xsd_namespace_uri(URI),
+  !,
+  node_attribute(IName,ID,Attribute,ns(Prefix,URI):Type,source),
+  xsd_flatten_attributes(IName,ID,List_Of_Attributes,Namespaces).
+xsd_flatten_attributes(IName,ID,[Attribute=Value|List_Of_Attributes],Namespaces) :-
   node_attribute(IName,ID,Attribute,Value,source),
-  xsd_flatten_attributes(IName,ID,List_Of_Attributes).
+  xsd_flatten_attributes(IName,ID,List_Of_Attributes,Namespaces).
+
+
+/**
+ * get_defined_namespaces/2
+ * get_defined_namespaces(+List_Of_Attributes, -List_Of_Namespaces)
+ *
+ * Get a list of namespaces defined in a list of
+ *   attributes.
+ *
+ * Example:
+ *   get_defined_namespaces([xmlns='http://some'], [ns('','http://some')]).
+ */
+get_defined_namespaces([],[]).
+get_defined_namespaces([xmlns=URI|R],[ns('',URI)|RR]) :-
+  !,
+  get_defined_namespaces(R,RR).
+get_defined_namespaces([xmlns:Prefix=URI|R],[ns(Prefix,URI)|RR]) :-
+  !,
+  get_defined_namespaces(R,RR).
+get_defined_namespaces([_Attribute|R],RR) :-
+  !,
+  get_defined_namespaces(R,RR).
+
+
+/**
+ * merge_namespaces/3
+ * merge_namespaces(+List1, +List2, -Merged)
+ */
+merge_namespaces([],List2,List2).
+merge_namespaces([ns(Prefix,URI)|R],List2,Result) :-
+  member(ns(Prefix,URI2),List2),
+  !,
+  URI = URI2,
+  merge_namespaces(R,List2,Result).
+merge_namespaces([ns(Prefix,URI)|R],List2,[ns(Prefix,URI)|Result]) :-
+  \+member(ns(Prefix,_URI),List2),
+  !,
+  merge_namespaces(R,List2,Result).
 
 
 /**
@@ -1133,7 +1213,7 @@ transform(IName),
     node_attribute(IName,Extension_ID,base,Base,_)
   ==>
     xsd_namespace(Namespace),
-    \+namespace(Base,_Base_Namespace,_Base_Type)
+    no_xsd_namespace(Base)
   |
     string_concat('#/definitions/',Base,Base_Reference),
     JSON = [
@@ -1147,7 +1227,7 @@ transform(IName),
     node_attribute(IName,Extension_ID,base,Base,_)
   ==>
     xsd_namespace(Namespace),
-    \+namespace(Base,_Base_Namespace,_Base_Type),
+    no_xsd_namespace(Base),
     Extension_Children \= []
   |
     string_concat('#/definitions/',Base,Base_Reference),
@@ -1235,7 +1315,7 @@ transform(IName),
     node_attribute(IName,ID,base,Base,_)
   ==>
     xsd_namespace(Namespace),
-    \+namespace(Base,_Base_Namespace,_Base_Type)
+    no_xsd_namespace(Base)
   |
     string_concat('#/definitions/',Base,Base_Reference),
     (
@@ -1342,7 +1422,7 @@ transform(IName),
     node_attribute(IName,ID,type,Type_With_NS,_)
   ==>
     xsd_namespace(Namespace),
-    \+valid_xsd_type(Type_With_NS,_Type)
+    no_xsd_namespace(Type_With_NS)
   |
     reference_type(Type_With_NS,JSON),
     json(IName,ID,JSON).
