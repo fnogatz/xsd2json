@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<xsa:schema xmlns:xsa="http://www.w3.org/2001/XMLSchema" xmlns:xsb="http://www.w3.org/2001/XMLSchema">
+  <xsa:element name="dog" type="xsb:string" />
+</xsa:schema>
