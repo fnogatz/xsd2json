@@ -2060,17 +2060,17 @@ transform(IName_Parent),
     node(IName_Parent,NS1,schema,Schema_ID,_Schema_Children,_Schema_Parent_ID),
     node(IName_Parent,NS2,import,Import_ID,_Import_Children,Schema_ID),
     node_attribute(IName_Parent,Import_ID,schemaLocation,Schema_Location,_),
-    node_attribute(IName_Parent,Import_ID,namespace,Namespace_URI,_)
+    node_attribute(IName_Parent,Import_ID,namespace,_Namespace_URI,_)
   \
     json(IName_Parent,Schema_ID,Schema_JSON),
     xsd2json_result(IName_Import,Import_JSON)
   <=>
     xsd_namespaces([NS1,NS2]),
     relative_input(IName_Parent,Schema_Location,Location),
-    input_name(Location,IName_Import),
-    namespace_uri(Import_NS,Namespace_URI)
+    input_name(Location,IName_Import)
   |
-    add_namespace(Import_JSON,Import_NS,Import_JSON_With_NS),
+    % add_namespace(Import_JSON,Import_NS,Import_JSON_With_NS),
+    Import_JSON_With_NS = Import_JSON,
     merge_json(Schema_JSON,Import_JSON_With_NS,JSON),
     json(IName_Parent,Schema_ID,JSON).
 

@@ -1,6 +1,6 @@
 {
   "definitions": {
-    "some:pets": {
+    "pets": {
       "enum": [
         "cat",
         "dog",
