@@ -6,7 +6,7 @@ Prolog/CHR module to translate an XML Schema into equivalent JSON Schema.
 
 All you need is [SWI-Prolog](http://www.swi-prolog.org/). See there for installation instructions.
 
-The command line interface is compilated using swipl's [`-c` option](http://www.swi-prolog.org/pldoc/doc_for?object=section%282,%272.10%27,swi%28%27/doc/Manual/compilation.html%27%29%29):
+The command line interface is compiled using swipl's [`-c` option](http://www.swi-prolog.org/pldoc/doc_for?object=section%282,%272.10%27,swi%28%27/doc/Manual/compilation.html%27%29%29):
 
 	swipl --goal=main -o cli -c cli.pl
 
