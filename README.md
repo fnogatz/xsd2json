@@ -6,39 +6,49 @@ Translate an XML Schema into equivalent JSON Schema based on SWI-Prolog and Cons
 
 First, make sure [SWI-Prolog](http://www.swi-prolog.org/) is installed. This module expects the `swipl` binary to be in PATH somewhere. In other words, type this:
 
-	$ swipl
+```bash
+swipl
+```
 
 If that works, so will xsd2json.
 
 Using [npm](http://npmjs.org/), you can install xsd2json by calling this:
 
-	$ npm install -g xsd2json
+```bash
+npm install -g xsd2json
+```
 
 Or simply clone this repository:
 
-	$ git clone https://github.com/fnogatz/xsd2json.git
+```bash
+git clone https://github.com/fnogatz/xsd2json.git
+```
 
 ## Usage as CLI
 
 If you install xsd2json via npm it will create a new command `xsd2json`:
 
-	$ xsd2json /path/to/your.xsd > /created/schema.json
+```bash
+xsd2json /path/to/your.xsd > /created/schema.json
+```
 
 ## Usage with node.js
 
 The xsd2json module can be used programmatically as function or stream:
 
-	var xsd2json = require('xsd2json');
-	var filename = 'test.xsd';
+```js
+var xsd2json = require('xsd2json');
+var filename = 'test.xsd';
 
-	// use as stream: Read from stdin
-	xsd2json(filename)
-	  .pipe(process.stdout);
+// use as stream: Read from stdin
+xsd2json(filename)
+  .pipe(process.stdout);
 
-	// use as function
-	xsd2json(filename, function(err, schemaObject) {
-	  console.log(JSON.stringify(schemaObject, null, 2));
-	});
+// use as function
+xsd2json(filename, function(err, schemaObject) {
+  console.log(JSON.stringify(schemaObject, null, 2));
+});
+```
 
 ## Usage with Prolog
 
@@ -52,7 +62,6 @@ Translation with CHR"](http://arxiv.org/pdf/1406.2125v1.pdf).
 ## Project Structure
 
 xsd2json is developed in a test-driven way. This reflects in the project's folder structure, too: The `/lib-pl` directory contains the Prolog and CHR stuff while you will find the [TAP](http://testanything.org/) testing framework implemented in [node.js](http://nodejs.org/) under `/test`. Both directories contain their own Readme-File that explain their usage.
-
 
 ## Alternatives
 
