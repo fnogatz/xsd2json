@@ -63,6 +63,12 @@ Translation with CHR"](http://arxiv.org/pdf/1406.2125v1.pdf).
 
 xsd2json is developed in a test-driven way. This reflects in the project's folder structure, too: The `/lib-pl` directory contains the Prolog and CHR stuff while you will find the [TAP](http://testanything.org/) testing framework implemented in [node.js](http://nodejs.org/) under `/test`. Both directories contain their own Readme-File that explain their usage.
 
+## Known Bugs
+
+xsd2json's tests are always executed using the latest stable release of SWI-Prolog. Make sure to have the latest version installed before you file a bug.
+
+Apparently SWI-Prolog of version 7.2.x ships with a bug in the CHR implementation. Use version 7.4 or higher instead.
+
 ## Alternatives
 
 * [node-xsd2json](https://github.com/MGDIS/xsd2json) (Fork of this module.)
