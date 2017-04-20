@@ -6,25 +6,45 @@ Prolog/CHR module to translate an XML Schema into equivalent JSON Schema.
 
 All you need is [SWI-Prolog](http://www.swi-prolog.org/). See there for installation instructions.
 
-The command line interface is compiled using swipl's [`-c` option](http://www.swi-prolog.org/pldoc/doc_for?object=section%282,%272.10%27,swi%28%27/doc/Manual/compilation.html%27%29%29):
+### Pre-Compilation
 
-	swipl --goal=main -o cli -c cli.pl
+It is possible to create a pre-compiled file which increases the tool's performance significantly. The command line interface is compiled using swipl's [`-c` option](http://www.swi-prolog.org/pldoc/doc_for?object=section%282,%272.10%27,swi%28%27/doc/Manual/compilation.html%27%29%29):
 
-## Usage
+```bash
+swipl -g main -o cli -c cli.pl
+```
+
+## Usage as CLI
 
 `xsd2json` provides a command line interface. You can directly execute it via
 
-	./cli /path/to/your.xsd
+```bash
+swipl -g main cli.pl -- /path/to/your.xsd
+```
+
+Call with `--help` instead of the XSD path to get more options.
+
+After the pre-compilation step mentioned before, the created executable can be called via:
+
+```bash
+./cli /path/to/your.xsd
+```
+
+## Usage with SWI-Prolog
 
 The `xsd2json.pl` module provides a predicate `xsd2json/2` which can be used to convert a given XSD file into the equivalent JSON Schema. Call it via `swipl -s xsd2json.pl` followed by
 
-	xsd2json('/path/to/your.xsd',JSON)
+```prolog
+xsd2json('/path/to/your.xsd',JSON)
+```
 
-which binds the `JSON` variable to the created JSON Schema. If you want a pretty output, simply call
+This binds the `JSON` variable to the created JSON Schema. If you want a pretty output, simply call instead:
 
-	use_module(library(http/json)).
+```prolog
+use_module(library(http/json)).
 
-	xsd2json('/path/to/your.xsd',JSON),
-	  json_write(user_output,JSON).
+xsd2json('/path/to/your.xsd',JSON),
+  json_write(user_output,JSON).
+```
 
-instead. This will print the produced JSON Schema in front of the content of the CHR constraint store, so make sure to scroll up if needed.
+This will print the produced JSON Schema in front of the content of the CHR constraint store, so make sure to scroll up if needed.
