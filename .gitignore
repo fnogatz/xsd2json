@@ -34,4 +34,4 @@ node_modules
 test/in-progress
 
 # Prolog qlf file
-lib-pl/cli
+lib-pl/cli.exe

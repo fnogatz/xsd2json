@@ -11,8 +11,10 @@ All you need is [SWI-Prolog](http://www.swi-prolog.org/). See there for installa
 It is possible to create a pre-compiled file which increases the tool's performance significantly. The command line interface is compiled using swipl's [`-c` option](http://www.swi-prolog.org/pldoc/doc_for?object=section%282,%272.10%27,swi%28%27/doc/Manual/compilation.html%27%29%29):
 
 ```bash
-swipl -g main -o cli -c cli.pl
+swipl -g main -o cli.exe -c cli.pl
 ```
+
+*The `.exe` suffix is chosen for compatibility with Windows systems. See [issue #51](https://github.com/fnogatz/xsd2json/issues/51) for more details.*
 
 ## Usage as CLI
 
@@ -27,7 +29,7 @@ Call with `--help` instead of the XSD path to get more options.
 After the pre-compilation step mentioned before, the created executable can be called via:
 
 ```bash
-./cli /path/to/your.xsd
+./cli.exe /path/to/your.xsd
 ```
 
 ## Usage with SWI-Prolog
