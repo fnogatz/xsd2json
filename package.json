@@ -5,7 +5,7 @@
   "main": "index.js",
   "bin": "./lib-pl/cli.exe",
   "scripts": {
-    "postinstall": "npm run create-qlf",
+    "preinstall": "npm run create-qlf",
     "pretest": "npm run create-qlf",
     "prepublish": "git checkout -- lib-pl/cli.exe",
     "create-qlf": "swipl -O --goal=main -o lib-pl/cli.exe -c lib-pl/cli.pl",
