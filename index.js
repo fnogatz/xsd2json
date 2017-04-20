@@ -4,7 +4,7 @@ var childProcess = require('child_process')
 var concat = require('concat-stream')
 var path = require('path')
 
-var CLI = path.resolve(__dirname, 'lib-pl', 'cli')
+var CLI = path.resolve(__dirname, 'lib-pl', 'cli.exe')
 
 function xsd2json (filename, options, callback) {
   if (arguments.length === 1) {

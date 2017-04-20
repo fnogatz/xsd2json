@@ -11,7 +11,7 @@
     "create-qlf": "swipl -O --goal=main -o lib-pl/cli.exe -c lib-pl/cli.pl",
     "standard": "standard",
     "test": "npm run standard && npm run test-cli && npm run test-converter",
-    "test-cli": "./lib-pl/cli --version && ./lib-pl/cli test/xsd/all_element.xsd",
+    "test-cli": "./lib-pl/cli.exe --version && ./lib-pl/cli.exe test/xsd/all_element.xsd",
     "test-converter": "node test/index.js interpreted",
     "test-examples": "node test/index.js validate-json"
   },
