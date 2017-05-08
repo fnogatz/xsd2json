@@ -1,5 +1,7 @@
 # xsd2json
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/fnogatz/xsd2json.svg)](https://greenkeeper.io/)
+
 Translate an XML Schema into equivalent JSON Schema based on SWI-Prolog and Constraint Handling Rules (CHR). For usage directly in Prolog or node.js.
 
 ## Installation
