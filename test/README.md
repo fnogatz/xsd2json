@@ -2,7 +2,6 @@
 
 Tools to test the `xsd2json` Prolog library.
 
-
 ## Provided tests
 
 ### Run interpreted tests
