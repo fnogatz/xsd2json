@@ -43,7 +43,7 @@
     "interpreted": "^0.7.0",
     "nomnom": "^1.8.0",
     "standard": "^10.0.0",
-    "tap": "^10.7.0",
+    "tap": "^11.0.0",
     "jayschema": "^0.3.1"
   }
 }
