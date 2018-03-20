@@ -46,6 +46,15 @@ opts_spec([
     ])
   ],
   [
+    opt(debuginfo),
+    type(boolean),
+    default(false),
+    longflags([ 'debug-info' ]),
+    help([
+      'show information usually needed for debugging'
+    ])
+  ],
+  [
     opt(help),
     type(boolean),
     default(false),
@@ -66,6 +75,19 @@ main(Opts,_PositionalArgs) :-
   memberchk(version(true),Opts), !,
   xsd2json:version(Version),
   writeln(Version),
+  halt(0).
+
+main(Opts,_PositionalArgs) :-
+  memberchk(debuginfo(true),Opts), !,
+  xsd2json:version(Version),
+  writeln('# xsd2json'),
+  writeln(Version),
+  writeln('# SWI-Prolog'),
+  shell('swipl --version'),
+  writeln('# npm'),
+  shell('npm -version'),
+  writeln('# node'),
+  shell('node -v'),
   halt(0).
 
 main(Opts,PositionalArgs) :-
