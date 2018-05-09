@@ -52,6 +52,10 @@ xsd2json(filename, function(err, schemaObject) {
 });
 ```
 
+In addition to the [command line options provided by the Prolog module](https://github.com/fnogatz/xsd2json/tree/master/lib-pl#synopsis), there are the following options available in the node.js module:
+- `noExe: true | false (default)`: Use the native Prolog interface instead of the pre-compiled `cli.exe`. This might be useful for MacOS users (see [issue #87](https://github.com/fnogatz/xsd2json/issues/87) for more details).
+- `swi: 'swipl' (default)`: Executable to call SWI-Prolog.
+
 ## Usage with Prolog
 
 xsd2json provides a predicate `xsd2json(+XSD,-JSON)`, which holds for a given XML Schema (either file path, URL or `stream`). For instructions on how to use xsd2json programmatically in Prolog, have a look at the Prolog module's [Readme](https://github.com/fnogatz/xsd2json/tree/master/lib-pl).

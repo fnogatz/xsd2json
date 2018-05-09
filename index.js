@@ -5,6 +5,13 @@ var concat = require('concat-stream')
 var path = require('path')
 
 var CLI = path.resolve(__dirname, 'lib-pl', 'cli.exe')
+var CLIPL = path.resolve(__dirname, 'lib-pl', 'cli.pl')
+var SWI = 'swipl'
+
+var reservedKeys = [
+  'noExe',
+  'swi'
+]
 
 function xsd2json (filename, options, callback) {
   if (arguments.length === 1) {
@@ -21,11 +28,27 @@ function xsd2json (filename, options, callback) {
 
   var spawnArgs = []
   for (var key in options) {
+    if (reservedKeys.indexOf(key) >= 0) {
+      continue
+    }
+
     spawnArgs.push('--' + key + '=' + options[key])
   }
   spawnArgs.push(filename)
 
-  var outputStream = childProcess.spawn(CLI, spawnArgs)
+  var outputStream
+  if (options.noExe) {
+    spawnArgs = [
+      '-g',
+      'main',
+      CLIPL,
+      '--'
+    ].concat(spawnArgs)
+
+    outputStream = childProcess.spawn(options.swi || SWI, spawnArgs)
+  } else {
+    outputStream = childProcess.spawn(CLI, spawnArgs)
+  }
 
   if (typeof callback !== 'function') {
     // no callback given --> return stream
