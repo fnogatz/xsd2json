@@ -32,6 +32,25 @@ After the pre-compilation step mentioned before, the created executable can be c
 ./cli.exe /path/to/your.xsd
 ```
 
+### Synopsis
+
+```
+USAGE: xsd2json [options] <path>
+
+convert a XSD file into equivalent JSON schema
+
+Options:
+--whitespace   -s  atom=remove    whitespace handling, one of
+                                      remove   :  clean whitespace  [default]
+                                      preserve :  keep whitespace
+--indentation  -i  integer=2      set indentation level
+                                    use 0 for single-line output
+--trace        -t  boolean=false  run with activated tracing
+--version      -v  boolean=false  show xsd2json version information
+--debug-info       boolean=false  show information usually needed for debugging
+--help         -h  boolean=false  display this help
+```
+
 ## Usage with SWI-Prolog
 
 The `xsd2json.pl` module provides a predicate `xsd2json/2` which can be used to convert a given XSD file into the equivalent JSON Schema. Call it via `swipl -s xsd2json.pl` followed by
