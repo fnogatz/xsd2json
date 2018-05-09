@@ -1,6 +1,6 @@
 {
   "name": "xsd2json",
-  "version": "1.11.6",
+  "version": "1.11.7",
   "description": "Translate an XML Schema into equivalent JSON Schema",
   "main": "index.js",
   "bin": "./lib-pl/cli.exe",
