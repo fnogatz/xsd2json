@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var fs = require('fs')
 var path = require('path')
 
@@ -7,7 +9,7 @@ var interpreted = require('interpreted')
 var tap = require('tap')
 var JaySchema = require('jayschema')
 var JSON_META_SCHEMA = require('jayschema/lib/suites/draft-04/json-schema-draft-v4.json')
-var parser = require('nomnom')
+var program = require('commander')
 var async = require('async')
 
 // get possible filenames
@@ -24,44 +26,42 @@ fs.readdir(path.resolve(__dirname, 'xsd'), function (err, filenames) {
 })
 
 function parseArguments (filenames) {
-  parser.command('interpreted')
-    .help('run all interpreted tests')
-    .option('files', {
-      help: 'display available files to test',
-      flag: true,
-      callback: function () {
-        return filenames.join('\n')
+  program
+    .command('interpreted')
+    .description('run all interpreted tests')
+    .option('--files', 'display available files to test')
+    .option('--file <list>', 'XSD file to test (all if not provided). You can specify a regular expression by encapsuling the term in single slashes', list)
+    .option('--ignore <list>', 'XSD files to ignore', list)
+    .option('--update', 'Update the JSON files by the interpreted result')
+    .action(function (cmd) {
+      if (cmd.files) {
+        console.log(filenames.join('\n'))
+        process.exit()
       }
-    })
-    .option('file', {
-      abbr: 'f',
-      help: 'XSD file to test (all if not provided). You can specify a regular expression by encapsuling the term in single slashes.',
-      list: true,
-      default: filenames
-    })
-    .option('ignore', {
-      abbr: 'i',
-      help: 'XSD file to ignore',
-      list: true,
-      choices: filenames,
-      default: []
-    })
-    .option('available-filenames', {
-      hidden: true,
-      list: true,
-      default: filenames
-    })
-    .option('update', {
-      flag: true,
-      help: 'Update the JSON files by the interpreted result'
-    })
-    .callback(runInterpretedTests)
 
-  parser.command('validate-json')
-    .help('validate the JSON test files against the draft-04 JSON Schema')
-    .callback(validateJSONfiles)
+      if (cmd.file === undefined) {
+        cmd.file = filenames
+      }
+      if (cmd.ignore === undefined) {
+        cmd.ignore = []
+      }
+      if (cmd.update === undefined) {
+        cmd.update = false
+      }
 
-  parser.parse()
+      cmd['available-filenames'] = filenames
+
+      runInterpretedTests(cmd)
+    })
+
+  program
+    .command('validate-json')
+    .description('Validate the JSON test files against the draft-04 JSON Schema')
+    .action(function (cmd) {
+      validateJSONfiles()
+    })
+
+  program.parse(process.argv)
 }
 
 function setOptions (options) {
@@ -139,4 +139,8 @@ function validateJSONfiles (options) {
       })
     })
   })
+}
+
+function list (val) {
+  return val.split(',')
 }
