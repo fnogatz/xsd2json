@@ -126,7 +126,7 @@ function validateJSONfiles (options) {
           var data = require(path.resolve(__dirname, 'json', filename))
           var valid = ajv.validateSchema(data)
 
-          t.ok(valid, 'is valid JSON Schema')
+          t.deepEqual(ajv.errors, null, 'Valid JSON Schema')
           t.end()
 
           callback(null)
