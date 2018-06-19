@@ -7,8 +7,8 @@ var xsd2json = require('../index')
 
 var interpreted = require('interpreted')
 var tap = require('tap')
-var JaySchema = require('jayschema')
-var JSON_META_SCHEMA = require('jayschema/lib/suites/draft-04/json-schema-draft-v4.json')
+var Ajv = require('ajv')
+var JSON_META_SCHEMA = require('ajv/lib/refs/json-schema-draft-04.json')
 var program = require('commander')
 var async = require('async')
 
@@ -117,15 +117,16 @@ function validateJSONfiles (options) {
   fs.readdir(path.resolve(__dirname, 'json'), function (err, files) {
     if (err) throw err
 
-    tap.test(files.length + ' files', function (t) {
-      var js = new JaySchema()
+    var ajv = new Ajv({ schemaId: 'id' })
+    ajv.addMetaSchema(JSON_META_SCHEMA)
 
+    tap.test(files.length + ' files', function (t) {
       async.eachSeries(files, function validateFile (filename, callback) {
         t.test(filename, function (t) {
-          var data = require(path.resolve(__dirname, 'json', filename))
-          var valid = js.validate(data, JSON_META_SCHEMA).length === 0
+          var schema = require(path.resolve(__dirname, 'json', filename))
+          ajv.validateSchema(schema)
 
-          t.ok(valid, 'is valid JSON Schema')
+          t.deepEqual(ajv.errors, null, 'Valid JSON Schema')
           t.end()
 
           callback(null)

@@ -499,7 +499,9 @@ elength([L|Ls],Length) :-
 cleanup_json(JSON,Result) :-
   remove_at_from_property_names(JSON,R1),
   resolve_facets(R1,R2),
-  Result = R2.
+  % add $schema property
+  merge_json(R2, json(['$schema'='http://json-schema.org/draft-04/schema#']), R3),
+  Result = R3.
 
 
 /**
