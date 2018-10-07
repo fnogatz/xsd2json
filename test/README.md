@@ -1,5 +1,8 @@
 # TAP test suite for xsd2json
 
+This is information text
+
+
 Tools to test the `xsd2json` Prolog library.
 
 ## Provided tests
