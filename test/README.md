@@ -1,7 +1,7 @@
 # TAP test suite for xsd2json
 
 This is information text
-
+This is new branch - feature/home-menu
 
 Tools to test the `xsd2json` Prolog library.
 
