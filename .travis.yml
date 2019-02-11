@@ -4,6 +4,7 @@ node_js:
   - "6"
   - "7"
   - "10"
+dist: xenial
 env:
   - TRAVIS_SWI_VERSION="stable"
 before_install:
