@@ -9,5 +9,5 @@ env:
   - TRAVIS_SWI_VERSION="stable"
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y build-essential autoconf curl chrpath pkg-config ncurses-dev libreadline-dev libedit-dev libgmp-dev libssl-dev unixodbc-dev zlib1g-dev libarchive-dev libossp-uuid-dev libxext-dev libice-dev libjpeg-dev libxinerama-dev libxft-dev libxpm-dev libxt-dev libdb-dev libpcre3-dev libyaml-dev junit make ninja-build cmake
+  - sudo apt-get install -y autoconf make libgmp-dev libxt-dev libjpeg-dev libxpm-dev libxft-dev cmake
   - rm -rf ~/.swivm && git clone https://github.com/fnogatz/swivm.git ~/.swivm && (cd ~/.swivm && git checkout `git describe --abbrev=0 --tags`) && source ~/.swivm/swivm.sh && swivm install $TRAVIS_SWI_VERSION && swivm use
