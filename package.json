@@ -39,7 +39,7 @@
     "concat-stream": "^2.0.0"
   },
   "devDependencies": {
-    "ajv": "^6.9.1",
+    "ajv": "^6.9.2",
     "async": "^2.6.1",
     "commander": "^2.15.1",
     "interpreted": "^1.0.0",
