@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "properties": {
+        "dog": {
+          "maxItems":2,
+          "type":"array",
+          "items": {
+            "type": "string"
+          },
+          "minItems":0
+        }
+      }
+    }
+  }
+}

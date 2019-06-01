@@ -1537,6 +1537,75 @@ transform(IName),
 
 
 /**
+ * ##########  XS:CHOICE  ##########
+ */
+
+/**
+ * `xs:element` within a `xs:choice` with the `maxOccurs` attribute
+ *   set to '1' and `minOccurs` to '0' or '1'.
+ */
+transform(IName),
+    node(IName,NS1,choice,Choice_ID,_Choice_Children,_Choice_Parent_ID),
+    node(IName,NS2,element,Element_ID,_Element_Children,Choice_ID),
+    json(IName,Element_ID,Element_JSON),
+    node_attribute(IName,Element_ID,minOccurs,MinOccurs,_),
+    node_attribute(IName,Element_ID,maxOccurs,'1',_),
+    node_attribute(IName,Element_ID,name,Element_Name,_)
+  ==>
+    xsd_namespaces([NS1,NS2])
+  |
+    Properties = [Element_Name=Element_JSON],
+    JSON = [type=object,properties=json(Properties)],
+    % add `required=[...]` if `minOccurs` = 1
+    (MinOccurs = '0', Full_JSON = JSON;
+      MinOccurs = '1', Full_JSON = [required=[Element_Name]|JSON]),
+    json(IName,Choice_ID,json(Full_JSON)).
+
+/**
+ * `xs:element` within a `xs:choice` with the `maxOccurs` attribute
+ *   set to 'unbounded' or >= 2.
+ */
+transform(IName),
+    node(IName,NS1,choice,Choice_ID,_Choice_Children,_Choice_Parent_ID),
+    node(IName,NS2,element,Element_ID,_Element_Children,Choice_ID),
+    json(IName,Element_ID,Element_JSON),
+    node_attribute(IName,Element_ID,minOccurs,MinOccurs,_),
+    node_attribute(IName,Element_ID,maxOccurs,MaxOccurs,_),
+    node_attribute(IName,Element_ID,name,Element_Name,_)
+  ==>
+    xsd_namespaces([NS1,NS2]),
+    to_number(MinOccurs,MinOccurs_Number),
+    (
+        MaxOccurs == unbounded
+      ;
+        to_number(MaxOccurs,MaxOccurs_Number),
+        MaxOccurs_Number >= 2
+    )
+  |
+    Array_JSON = [
+      type=array,
+      items=Element_JSON,
+      minItems=MinOccurs_Number
+    ],
+    % add `maxItems=...` if not 'unbounded'
+    (
+        MaxOccurs == unbounded,
+        Array_JSON_With_MaxItems = Array_JSON
+      ;
+        MaxOccurs \== unbounded,
+        Array_JSON_With_MaxItems = [maxItems=MaxOccurs_Number|Array_JSON]
+    ),
+    Properties = [Element_Name=json(Array_JSON_With_MaxItems)],
+    JSON = [
+      type=object,
+      properties=json(Properties)],
+    % add `required=[...]` if `minOccurs` > 0
+    (MinOccurs_Number >= 1, Full_JSON = [required=[Element_Name]|JSON];
+      MinOccurs_Number < 1, Full_JSON = JSON),
+    json(IName,Choice_ID,json(Full_JSON)).
+
+
+/**
  * ##########  XS:SEQUENCE  ##########
  */
 
@@ -1621,6 +1690,19 @@ transform(IName),
     xsd_namespaces([NS1,NS2])
   |
     json(IName,ComplexType_ID,All_JSON).
+
+
+/**
+ * `xs:complexType` which has a `xs:choice` child.
+ */
+transform(IName),
+    node(IName,NS1,complexType,ComplexType_ID,_ComplexType_Children,_ComplexType_Parent_ID),
+    node(IName,NS2,choice,Choice_ID,_Choice_Children,ComplexType_ID),
+    json(IName,Choice_ID,Sequence_JSON)
+  ==>
+    xsd_namespaces([NS1,NS2])
+  |
+    json(IName,ComplexType_ID,Sequence_JSON).
 
 
 /**

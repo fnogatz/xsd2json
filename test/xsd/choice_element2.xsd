@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="pets">
+    <xs:choice>
+      <xs:element name="dog" type="xs:string" minOccurs="0" maxOccurs="2" />
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>
