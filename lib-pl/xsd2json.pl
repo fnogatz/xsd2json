@@ -272,7 +272,9 @@ xsd2json(Input,Options,Result) :-
   input_name(Input,Input_Name),
   Namespaces = [],
   xsd_flatten_nodes(Input_Name,Root_ID,0,XSD,Namespaces,Children_IDs),
+  % chr_show_store(xsd2json), %% uncomment for debugging (before transformation)
   transform(Input_Name),
+  % chr_show_store(xsd2json), %% uncomment for debugging (after transformation)
   Children_IDs = [First_Element|_],
   build_schema(Input_Name),
   get_json(Input_Name,First_Element,JSON),
