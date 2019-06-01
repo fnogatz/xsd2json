@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="dog">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="10" />
+      <xs:maxInclusive value="20" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>

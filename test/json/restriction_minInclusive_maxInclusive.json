@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {
+    "dog": {
+      "type": "integer",
+      "minimum": 10,
+      "maximum": 20,
+      "exclusiveMaximum": false
+    }
+  }
+}
