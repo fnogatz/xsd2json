@@ -10,8 +10,7 @@
  *
  * On_Conflict:
  *   - 0/hard: fail
- *   - 9/soft: rename keys in objects if the occure multiple
- *           times
+ *   - 9/soft: rename keys in objects if they occur multiple times
  *
  * Exampes:
  *   merge_json(json([type=1]), json([type=1]), json([type=1]), _).
