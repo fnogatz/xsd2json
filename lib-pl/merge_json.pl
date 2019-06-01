@@ -137,6 +137,7 @@ merge_facets(json([Key=Value|Rest_JSON_List1]),json(JSON_List2),json(JSON)) :-
   \+lookup(Key,JSON_List2,_Value_in_JSON_List2),
   merge_facets(json(Rest_JSON_List1),json(JSON_List2),json(Rest_Merged)),
   JSON = [Key=Value|Rest_Merged].
+%merge_facets(A,B,_) :- writeln(A), writeln(B), !, false.
 
 
 /**
@@ -152,3 +153,5 @@ merge_facet(minimum,A,B,B) :- A < B.
 merge_facet(maximum,A,B,A) :- A =< B.
 merge_facet(maximum,A,B,B) :- A > B.
 merge_facet(pattern,A,B,R) :- string_concat(['(',A,'|',B,')'],R).
+merge_facet(exclusiveMinimum,A,A,A).
+merge_facet(exclusiveMaximum,A,A,A).

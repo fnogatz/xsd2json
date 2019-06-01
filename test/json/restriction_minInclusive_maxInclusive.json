@@ -4,6 +4,7 @@
     "dog": {
       "type": "integer",
       "minimum": 10,
+      "exclusiveMinimum": false,
       "maximum": 20,
       "exclusiveMaximum": false
     }
