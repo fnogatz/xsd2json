@@ -20,10 +20,11 @@ Using [npm](http://npmjs.org/), you can install xsd2json by calling this:
 npm install -g xsd2json
 ```
 
-Or simply clone this repository:
+Or simply clone this repository and manually run the `preinstall` scripts to [create pre-compiled Prolog files](https://github.com/fnogatz/xsd2json/tree/master/lib-pl#pre-compilation):
 
 ```bash
 git clone https://github.com/fnogatz/xsd2json.git
+npm run preinstall
 ```
 
 ## Usage as CLI
