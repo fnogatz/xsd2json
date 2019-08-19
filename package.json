@@ -43,7 +43,7 @@
     "async": "^3.0.1",
     "commander": "^3.0.0",
     "interpreted": "^1.0.0",
-    "standard": "^13.0.1",
+    "standard": "^14.0.0",
     "tap": "^14.1.1"
   }
 }
