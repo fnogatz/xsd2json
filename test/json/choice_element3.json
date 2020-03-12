@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {
+    "pets": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "dog": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "properties": {
+            "cat": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
