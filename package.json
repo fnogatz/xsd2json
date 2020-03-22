@@ -41,7 +41,7 @@
   "devDependencies": {
     "ajv": "^6.9.2",
     "async": "^3.0.1",
-    "commander": "^4.0.0",
+    "commander": "^5.0.0",
     "interpreted": "^1.0.0",
     "standard": "^14.3.3",
     "tap": "^14.10.0"
