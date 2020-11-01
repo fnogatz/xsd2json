@@ -1,6 +1,6 @@
 {
   "name": "xsd2json",
-  "version": "1.12.16",
+  "version": "1.12.17",
   "description": "Translate an XML Schema into equivalent JSON Schema",
   "main": "index.js",
   "bin": {
