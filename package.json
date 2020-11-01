@@ -3,7 +3,9 @@
   "version": "1.12.16",
   "description": "Translate an XML Schema into equivalent JSON Schema",
   "main": "index.js",
-  "bin": "./lib-pl/cli.exe",
+  "bin": {
+    "xsd2json": "lib-pl/cli.exe"
+  },
   "scripts": {
     "preinstall": "npm run create-qlf",
     "pretest": "npm run create-qlf",
