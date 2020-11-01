@@ -1,14 +1,14 @@
 module.exports = xsd2json
 
-var childProcess = require('child_process')
-var concat = require('concat-stream')
-var path = require('path')
+const childProcess = require('child_process')
+const concat = require('concat-stream')
+const path = require('path')
 
-var CLI = path.resolve(__dirname, 'lib-pl', 'cli.exe')
-var CLIPL = path.resolve(__dirname, 'lib-pl', 'cli.pl')
-var SWI = 'swipl'
+const CLI = path.resolve(__dirname, 'lib-pl', 'cli.exe')
+const CLIPL = path.resolve(__dirname, 'lib-pl', 'cli.pl')
+const SWI = 'swipl'
 
-var reservedKeys = [
+const reservedKeys = [
   'noExe',
   'swi'
 ]
@@ -26,8 +26,8 @@ function xsd2json (filename, options, callback) {
     }
   }
 
-  var spawnArgs = []
-  for (var key in options) {
+  let spawnArgs = []
+  for (const key in options) {
     if (reservedKeys.indexOf(key) >= 0) {
       continue
     }
@@ -36,7 +36,7 @@ function xsd2json (filename, options, callback) {
   }
   spawnArgs.push(filename)
 
-  var outputStream
+  let outputStream
   if (options.noExe) {
     spawnArgs = [
       '-g',
@@ -57,7 +57,7 @@ function xsd2json (filename, options, callback) {
 
   outputStream.stderr.on('data', function (err) {
     if (options.trace) {
-      var lines = err.toString().split(/\n/)
+      const lines = err.toString().split(/\n/)
       lines.forEach(function (line) {
         if (/^CHR:\s+\([0-9]+\)\s+Apply:.*$/.test(line)) {
           console.log(line)
@@ -73,9 +73,10 @@ function xsd2json (filename, options, callback) {
 
 function reader (callback) {
   return concat(function (jsonBuff) {
-    var jsonString = jsonBuff.toString()
+    const jsonString = jsonBuff.toString()
+    let schema
     try {
-      var schema = JSON.parse(jsonString)
+      schema = JSON.parse(jsonString)
     } catch (err) {
       return callback(err)
     }

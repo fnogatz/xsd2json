@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
-var fs = require('fs')
-var path = require('path')
+const fs = require('fs')
+const path = require('path')
 
-var xsd2json = require('../index')
+const xsd2json = require('../index')
 
-var interpreted = require('interpreted')
-var tap = require('tap')
-var Ajv = require('ajv')
-var JSON_META_SCHEMA = require('ajv/lib/refs/json-schema-draft-04.json')
-var program = require('commander')
-var async = require('async')
+const interpreted = require('interpreted')
+const tap = require('tap')
+const Ajv = require('ajv')
+const JSON_META_SCHEMA = require('ajv/lib/refs/json-schema-draft-04.json')
+const program = require('commander')
+const async = require('async')
 
 // get possible filenames
 fs.readdir(path.resolve(__dirname, 'xsd'), function (err, filenames) {
@@ -39,13 +39,13 @@ function parseArguments (filenames) {
         process.exit()
       }
 
-      if (cmd.file === undefined) {
+      if (typeof cmd.file === 'undefined') {
         cmd.file = filenames
       }
-      if (cmd.ignore === undefined) {
+      if (typeof cmd.ignore === 'undefined') {
         cmd.ignore = []
       }
-      if (cmd.update === undefined) {
+      if (typeof cmd.update === 'undefined') {
         cmd.update = false
       }
 
@@ -65,9 +65,9 @@ function parseArguments (filenames) {
 }
 
 function setOptions (options) {
-  var files = options['available-filenames']
+  const files = options['available-filenames']
   if (options.file && options.file.length > 0) {
-    var run = []
+    let run = []
     options.file.forEach(function (file) {
       if (file[0] === '/' && file[0].slice(-1)[0] === '/') {
         run = run.concat(files.filter(function (filename) {
@@ -87,7 +87,7 @@ function setOptions (options) {
 
 function runInterpretedTests (options) {
   setOptions(options)
-  var run = options.file.filter(function (el) { return options.ignore.indexOf(el) === -1 })
+  const run = options.file.filter(function (el) { return options.ignore.indexOf(el) === -1 })
 
   interpreted({
     source: path.resolve(__dirname, 'xsd'),
@@ -97,7 +97,7 @@ function runInterpretedTests (options) {
 
     // This method will be used to test the files.
     test: function (name, content, callback) {
-      var filename = path.resolve(__dirname, 'xsd', name + '.xsd')
+      const filename = path.resolve(__dirname, 'xsd', name + '.xsd')
       xsd2json(filename, callback)
     },
 
@@ -117,13 +117,13 @@ function validateJSONfiles (options) {
   fs.readdir(path.resolve(__dirname, 'json'), function (err, files) {
     if (err) throw err
 
-    var ajv = new Ajv({ schemaId: 'id' })
+    const ajv = new Ajv({ schemaId: 'id' })
     ajv.addMetaSchema(JSON_META_SCHEMA)
 
     tap.test(files.length + ' files', function (t) {
       async.eachSeries(files, function validateFile (filename, callback) {
         t.test(filename, function (t) {
-          var schema = require(path.resolve(__dirname, 'json', filename))
+          const schema = require(path.resolve(__dirname, 'json', filename))
           ajv.validateSchema(schema)
 
           t.deepEqual(ajv.errors, null, 'Valid JSON Schema')

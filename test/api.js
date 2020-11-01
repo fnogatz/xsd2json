@@ -1,11 +1,11 @@
-var assert = require('assert')
-var path = require('path')
+const assert = require('assert')
+const path = require('path')
 
-var async = require('async')
+const async = require('async')
 
-var xsd2json = require('../index')
+const xsd2json = require('../index')
 
-var schema = {
+const schema = {
   $schema: 'http://json-schema.org/draft-04/schema#',
   type: 'string'
 }
