@@ -29,13 +29,7 @@
   ],
   "author": "Falco Nogatz <fnogatz@gmail.com>",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/fnogatz/xsd2json.git"
-  },
-  "bugs": {
-    "url": "http://github.com/fnogatz/xsd2json/issues"
-  },
+  "repository": "github:fnogatz/xsd2json",
   "dependencies": {
     "char-spinner": "^1.0.1",
     "concat-stream": "^2.0.0"
