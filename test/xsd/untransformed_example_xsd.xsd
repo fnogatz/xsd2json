@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema 
+	targetNamespace="http://KAPRION/DLS/HASS/verwaltenSamHasV01/getObjektsBasSnV01/lesenSamResTmV01" 
+	xmlns="http://KAPRION/DLS/HASS/verwaltenSamHasV01/getObjektsBasSnV01/lesenSamResTmV01" 
+	xmlns:lesenSamResTmV01="http://KAPRION/DLS/HASS/verwaltenSamHasV01/getObjektsBasSnV01/lesenSamResTmV01" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	xmlns:enumerationTypes="http://KAPRION/MSG/TransObjects/V02/EnumerationTypes" 
+	xmlns:elementaryTypes="http://KAPRION/MSG/TransObjects/V02/ElementaryTypes">
+	<xs:import namespace="http://KAPRION/MSG/TransObjects/V02/EnumerationTypes" schemaLocation="KAPRION.MSG.TransObjects.V02.EnumerationTypes.xsd"/>
+	<xs:import namespace="http://KAPRION/MSG/TransObjects/V02/ElementaryTypes" schemaLocation="KAPRION.MSG.TransObjects.V02.ElementaryTypes.xsd"/>
+	<xs:element name="Terminal_Eigenschaften_V02">
+		<xs:complexType>
+			<xs:annotation>
+				<xs:documentation>
+					[de][Eigenschaften des Terminals][Zusätzliche Eigenschaften des Terminals];
+					[en][][];
+				</xs:documentation>
+			</xs:annotation>
+			<xs:all>
+				<xs:element name="TerminalBezeichnung_V02" type="xs:string" minOccurs="0" maxOccurs="1">
+				</xs:element>
+				<xs:element name="TerminalEinbauOrt_V02" type="enumerationTypes:OrtTypCodes_V02" minOccurs="0" maxOccurs="1">
+				</xs:element>
+			</xs:all>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="Terminal_V02">
+		<xs:complexContent>
+			<xs:extension base="lesenSamResTmV01:Terminal_Id_V02">
+				<xs:all>
+					<xs:element name="TerminalUuid_V02" type="xs:string" minOccurs="1" maxOccurs="1">
+					</xs:element>
+					<xs:element ref="lesenSamResTmV01:Terminal_Beziehungen_V02" minOccurs="1" maxOccurs="1">
+					</xs:element>
+					<xs:element ref="lesenSamResTmV01:Terminal_Eigenschaften_V02" minOccurs="1" maxOccurs="1">
+					</xs:element>
+				</xs:all>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="Terminal_Id_V02">
+		<xs:annotation>
+			<xs:documentation>
+				[de][Identifikator des Terminals][Identifizierende Eigenschaften des Terminals];
+				[en][][];
+			</xs:documentation>
+		</xs:annotation>
+		<xs:all>
+			<xs:element name="TerminalEignerId_V02" type="lesenSamResTmV01:Organisation_Id_V02" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						EN1545: ServiceOperator
+					</xs:documentation>
+				</xs:annotation>
+
+			</xs:element>
+			<xs:element name="TerminalTyp_V02" type="enumerationTypes:TerminalTypCodes_V02" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						TerminalTyp_CODE
+						Dieses Attribut bezeichnet den Typ des
+						Terminals, z.B. "Erfassungsterminal". Codierung/ Wertevorrat: siehe Aufzählungstyp.
+					</xs:documentation>
+				</xs:annotation>
+
+			</xs:element>
+			<xs:element name="TerminalNummer_V02" type="elementaryTypes:ReferenceNumberTwo_V02" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Die Terminalnummer wird von der kontextgebenden Organisationseinheit vergeben.
+					</xs:documentation>
+				</xs:annotation>
+
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+</xs:schema>
