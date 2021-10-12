@@ -7,8 +7,7 @@ const xsd2json = require('../index')
 
 const interpreted = require('interpreted')
 const tap = require('tap')
-const Ajv = require('ajv')
-const JSON_META_SCHEMA = require('ajv/lib/refs/json-schema-draft-04.json')
+const Ajv = require('ajv-draft-04')
 const program = require('commander')
 const async = require('async')
 
@@ -118,7 +117,6 @@ function validateJSONfiles (options) {
     if (err) throw err
 
     const ajv = new Ajv({ schemaId: 'id' })
-    ajv.addMetaSchema(JSON_META_SCHEMA)
 
     tap.test(files.length + ' files', function (t) {
       async.eachSeries(files, function validateFile (filename, callback) {
