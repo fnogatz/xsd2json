@@ -14,7 +14,7 @@ async.parallel([
   function (cb) {
     xsd2json(path.resolve(__dirname, 'xsd', 'schema.xsd'), {}, function (err, res) {
       if (err) {
-        process.exit(1)
+        return cb(err)
       }
 
       assert.deepStrictEqual(res, schema)
@@ -25,8 +25,7 @@ async.parallel([
   function (cb) {
     xsd2json(path.resolve(__dirname, 'xsd', 'schema.xsd'), { noExe: true }, function (err, res) {
       if (err) {
-        console.log(err)
-        process.exit(1)
+        return cb(err)
       }
 
       assert.deepStrictEqual(res, schema)
@@ -36,6 +35,7 @@ async.parallel([
   }
 ], function (err, results) {
   if (err) {
+    console.log(err)
     process.exit(1)
   }
 
