@@ -91,7 +91,7 @@ function runInterpretedTests (options) {
   interpreted({
     source: path.resolve(__dirname, 'xsd'),
     expected: path.resolve(__dirname, 'json'),
-    run: run,
+    run,
     update: options.update,
 
     // This method will be used to test the files.
